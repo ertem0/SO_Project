@@ -13,7 +13,8 @@ OBJS_CONSOLE = $(SRCS_CONSOLE:.C=)
 all: $(OBJS) $(OBJS_SENSOR) $(OBJS_CONSOLE)
 
 $(OBJS): $(SRCS)
-	$(CC) $(THREADS) $(CFLAGS) -o $@ $^
+#	$@ (target) is the OBJS and $^ (dependecies) is the SRCS
+	$(CC) $(THREADS) $(CFLAGS) -o $@ $^ 
 
 $(OBJS_SENSOR): $(SRCS_SENSOR)
 	$(CC) $(CFLAGS) -o $@ $^
