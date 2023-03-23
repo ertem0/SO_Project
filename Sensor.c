@@ -12,6 +12,8 @@
 #include <fcntl.h>  
 #include <stdarg.h>
 #include "SharedMEM.h"
+#include <string.h>
+#include <ctype.h>
 
 
 //generate random munber between min and max parameters
@@ -22,7 +24,7 @@ int random_number(int min, int max)
 
 
 
-int main(int argc, char * [])
+int main(int argc, char *argv [])
 {
 
     if (argc != 5)
@@ -38,11 +40,11 @@ int main(int argc, char * [])
     //first parameter size must be between 3 and 32
     if (strlen(argv[2]) < 3 || strlen(argv[2]) > 32)
     {
-        printf("Error: Expected third parameter to be between 3 and 32 characters, got %d\n", strlen(argv[2]));
+        printf("Error: Expected third parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[2]));
         exit(1);
     }
     //first parameter can be a string with characters, numbers, and _
-    for (int i = 0; i < strlen(argv[2]); i++)
+    for (size_t i = 0; i < strlen(argv[2]); i++)
     {
         if (argv[2][i] != '_' && !isalnum(argv[2][i]))
         {

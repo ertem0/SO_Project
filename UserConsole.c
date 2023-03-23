@@ -12,6 +12,8 @@
 #include <fcntl.h>  
 #include <stdarg.h>
 #include "SharedMEM.h"
+#include <string.h>
+#include <ctype.h>
 
 
 int main(int argc, char *argv[])
@@ -36,8 +38,6 @@ int main(int argc, char *argv[])
 
     //ESCREVER PARTE argv[1] == "sensors" PARA MOSTRAR TODOS OS SENSORES Q JA ENVIARAM INFO PARA O SISTEMA
 
-
-    //if first argument = 'add_alert', expect 4 more arguments
     if (strcmp(argv[1], "add_alert") == 0)
     {
         if (argc != 6)
@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
         }
         if (strlen(argv[2]) < 3 || strlen(argv[2]) > 32)
         {
-            printf("Error: Expected second parameter to be between 3 and 32 characters, got %d\n", strlen(argv[2]));
+            printf("Error: Expected second parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[2]));
             exit(1);
         }
-        for (int i = 0; i < strlen(argv[2]); i++)
+        for (size_t i = 0; i < strlen(argv[2]); i++)
         {
             if (argv[2][i] != '_' && !isalnum(argv[2][i]))
             {
@@ -64,18 +64,20 @@ int main(int argc, char *argv[])
             printf("Error: Expected fourth parameter to be <= fifth parameter, got %d and %d\n", atoi(argv[4]), atoi(argv[5]));
             exit(1);
         }
-
         int id = atoi(argv[2]);
         char *key = argv[3];
         int min = atoi(argv[4]);
         int max = atoi(argv[5]);
-
-
     }
 
-
-
-
+    if (strcmp(argv[1], "remove_alert") == 0)
+    {
+        if (argc != 3)
+        {
+            printf("Error: Expected 2 parameters, got %d\n", argc);
+            exit(1);
+        }
+    }
 
 
     return 0;
