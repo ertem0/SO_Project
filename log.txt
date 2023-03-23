@@ -1,0 +1,477 @@
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 0 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] System Manager finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished
+[18:27:57] Shared memory created successfully
+[18:27:57] QUEUE_SZ = -681920704
+[18:27:57] N_WORKERS = -681920704
+[18:27:57] MAX_KEYS = -681920704
+[18:27:57] MAX_SENSORS = -681920704
+[18:27:57] MAX_ALERTS = -681920704
+[18:27:57] Config file read successfully
+[18:27:57] Console Reader -8266281847110073896 started
+[18:27:57] Console Reader 0 finished
+[18:27:57] Sensor Reader -8266278549112061480 started
+[18:27:57] Sensor Reader 0 finished
+[18:27:57] Dispacher -8266279647013076520 started
+[18:27:57] Dispacher 0 finished
+[18:27:57] Worker 1 started
+[18:27:57] Worker 1 finished

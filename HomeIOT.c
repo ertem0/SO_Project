@@ -21,9 +21,6 @@ int MAX_ALERTS;
 FILE *fl;
 int shmid;
 SharedMEM *sharedmem;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t mutex_log = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
 void lprint(const char* format, ...) {
     // check if file exists
@@ -35,14 +32,15 @@ void lprint(const char* format, ...) {
 
 
     time_t now = time(NULL);
-    struct tm *tm_struct = localtime(&now);
+    struct tm tm_struct;
+    localtime_r(&now, &tm_struct);
 
-    int hour = tm_struct->tm_hour;
-    int min = tm_struct->tm_min;
-    int sec = tm_struct->tm_sec;
+    int hour = tm_struct.tm_hour;
+    int min = tm_struct.tm_min;
+    int sec = tm_struct.tm_sec;
 
 
-    pthread_mutex_lock(&mutex_log);
+    pthread_mutex_lock(&sharedmem->mutex_log);
     va_list args;
     va_start(args, format);
     printf("[%d:%d:%d] ", hour, min, sec);
@@ -50,24 +48,24 @@ void lprint(const char* format, ...) {
     fprintf(fl, "[%d:%d:%d] ", hour, min, sec);
     vfprintf(fl, format, args);
     va_end(args);
-    pthread_mutex_unlock(&mutex_log);
+    pthread_mutex_unlock(&sharedmem->mutex_log);
 }
 
 void sysclose(){
     //close log file
     fclose(fl);
     lprint("Log file closed successfully\n");
+    //close mutex
+    pthread_mutex_destroy(&sharedmem->mutex);
+    pthread_mutex_destroy(&sharedmem->mutex_log);
+    lprint("Mutexs closed successfully\n");
+    //close condition variable
+    pthread_cond_destroy(&sharedmem->cond);
+    lprint("Condition variable closed successfully\n");
     //detach and delete shared memory
     shmdt(sharedmem);
     shmctl(shmid, IPC_RMID, NULL);
-    lprint("Shared memory deleted successfully\n");
-    //close mutex
-    pthread_mutex_destroy(&mutex);
-    pthread_mutex_destroy(&mutex_log);
-    lprint("Mutexs closed successfully\n");
-    //close condition variable
-    pthread_cond_destroy(&cond);
-    lprint("Condition variable closed successfully\n");
+    printf("Shared memory deleted successfully\n");
 
     return;
 }
@@ -84,6 +82,7 @@ int readConfigFile(char *filename)
     //read number from line
     int invalid = 0;
 
+    //TODO: verificar fscanf ler inteiro
     fscanf(fp, "%d", &QUEUE_SZ);
     if(QUEUE_SZ < 1){
         lprint("QUEUE_SZ must be greater than 0\n");
@@ -128,7 +127,6 @@ int readConfigFile(char *filename)
 }
 
 void worker(){
-    printf("Worker %d started\n", getpid());
     lprint("Worker %d started\n", getpid());
 
     //read from shared memory
@@ -189,10 +187,13 @@ void systemManager(){
     pthread_create(&threads[2], NULL, dispacher, (void *)id[2]);
 
     for(int i = 0; i < N_WORKERS; i++){ 
-        if(!fork()){
+        if(fork()==0){
             worker();
             exit(0);
-        } 
+        }else if(fork()==-1){
+            perror("Error creating worker");
+            exit(0);
+        }
     }
 
     //wait for threads to finish
@@ -215,7 +216,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: ./HomeIOT <config file>: Too many or too few arguments\n");
         return 0;
     }
-
+    
     //opening log file
     fl = fopen("log.txt", "w");
     if (fl == NULL)
@@ -223,6 +224,41 @@ int main(int argc, char *argv[])
         perror("Error opening log file");
         return 0;
     }
+    
+    //create shared memory of SharedMEM struct
+    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM), IPC_CREAT | 0666);
+    if (shmid < 0)
+    {
+        perror("shmget");
+        //TODO: fechar o q tenho ate agora
+        return 0;
+    }    
+    sharedmem = (SharedMEM *)shmat(shmid, NULL, 0);
+    if (sharedmem == (SharedMEM *)-1)
+    {
+        perror("shmat");
+        //TODO: fechar o q tenho ate agora
+        return 0;
+    }
+    lprint("Shared memory created successfully\n");
+
+    //create mutex
+    pthread_mutexattr_t att;
+    pthread_mutexattr_init(&att);
+    //pthread_mutexattr_setrobust(&att, PTHREAD_MUTEX_STALLED);
+    pthread_mutexattr_setpshared(&att, PTHREAD_PROCESS_SHARED);
+    pthread_mutex_init(&sharedmem->mutex, &att);
+    pthread_mutex_init(&sharedmem->mutex_log, &att);
+
+    //create semaphores
+    //maybe not needed
+
+    //create condition variables
+    pthread_condattr_t condatt;
+    pthread_condattr_init(&condatt);
+    pthread_condattr_setpshared(&condatt, PTHREAD_PROCESS_SHARED);
+    pthread_cond_init(&sharedmem->cond, &condatt);
+
     
     //read config file
     if(readConfigFile(argv[1])){
@@ -232,31 +268,6 @@ int main(int argc, char *argv[])
         perror("Config file read failed");
         return 0;
     }
-
-
-    //create shared memory of SharedMEM struct
-    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM), IPC_CREAT | 0666);
-    if (shmid < 0)
-    {
-        perror("shmget");
-        return 0;
-    }    
-    sharedmem = (SharedMEM *)shmat(shmid, NULL, 0);
-    if (sharedmem == (SharedMEM *)-1)
-    {
-        perror("shmat");
-        return 0;
-    }
-    lprint("Shared memory created successfully\n");
-
-    //create semaphores
-    //maybe not needed
-
-    //create mutex
-    //created above
-
-    //create condition variables
-    //created above
 
     systemManager();
 
