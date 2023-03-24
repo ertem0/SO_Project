@@ -30,7 +30,6 @@ void lprint(const char* format, ...) {
         exit(1);
     }
 
-
     time_t now = time(NULL);
     struct tm tm_struct;
     localtime_r(&now, &tm_struct);
@@ -38,7 +37,6 @@ void lprint(const char* format, ...) {
     int hour = tm_struct.tm_hour;
     int min = tm_struct.tm_min;
     int sec = tm_struct.tm_sec;
-
 
     pthread_mutex_lock(&sharedmem->mutex_log);
     va_list args;
@@ -126,6 +124,18 @@ int readConfigFile(char *filename)
     return 1;
 }
 
+void alertWatcher(){
+    lprint("Alert Watcher started\n");
+
+    //read from shared memory
+    //check if key is valid
+    //if key is valid, send to sensor
+    //if key is invalid, send to alert
+
+    lprint("Alert Watcher finished\n");
+    return;
+}
+
 void worker(){
     lprint("Worker %d started\n", getpid());
 
@@ -133,6 +143,7 @@ void worker(){
     //check if key is valid
     //if key is valid, send to sensor
     //if key is invalid, send to alert
+
     lprint("Worker %d finished\n", getpid());
     return;
 }
@@ -187,13 +198,23 @@ void systemManager(){
     pthread_create(&threads[2], NULL, dispacher, (void *)id[2]);
 
     for(int i = 0; i < N_WORKERS; i++){ 
-        if(fork()==0){
+        pid_t pid = fork();
+        if(pid==0){
             worker();
             exit(0);
-        }else if(fork()==-1){
+        }else if(pid==-1){
             perror("Error creating worker");
             exit(0);
         }
+    }
+
+    pid_t pid = fork();
+    if(pid==0){
+        alertWatcher();
+        exit(0);
+    }else if(pid==-1){
+        perror("Error creating alert watcher");
+        exit(0);
     }
 
     //wait for threads to finish
@@ -205,6 +226,8 @@ void systemManager(){
     for(int i = 0; i < N_WORKERS; i++){
         wait(NULL);
     }
+    //wait for alert watcher to finish
+    wait(NULL);
 
     lprint("System Manager finished\n");
 }
@@ -230,14 +253,17 @@ int main(int argc, char *argv[])
     if (shmid < 0)
     {
         perror("shmget");
-        //TODO: fechar o q tenho ate agora
+        //TODO: fechar o q tenho ate agora (acho q ta tudo)
+        fclose(fl);
         return 0;
     }    
     sharedmem = (SharedMEM *)shmat(shmid, NULL, 0);
     if (sharedmem == (SharedMEM *)-1)
     {
         perror("shmat");
-        //TODO: fechar o q tenho ate agora
+        //TODO: fechar o q tenho ate  (acho q ta tudo)
+        fclose(fl);
+        shmctl(shmid, IPC_RMID, NULL);
         return 0;
     }
     lprint("Shared memory created successfully\n");
@@ -266,6 +292,7 @@ int main(int argc, char *argv[])
     }
     else{
         perror("Config file read failed");
+        sysclose();
         return 0;
     }
 
