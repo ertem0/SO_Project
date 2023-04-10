@@ -26,7 +26,6 @@ int random_number(int min, int max)
 
 int main(int argc, char *argv [])
 {
-
     if (argc != 6)
     {
         printf("Error: Expected 5 parameters, got %d\n", argc);
@@ -37,6 +36,15 @@ int main(int argc, char *argv [])
     {
         printf("Error: Expected first parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[1]));
         exit(1);
+    }
+    //only alfanumeric characters
+    for(size_t i = 0; i < strlen(argv[1]); i++)
+    {
+        if (!isalnum(argv[1][i]))
+        {
+            printf("Error: Expected first parameter to be a string with characters and numbers, got %c\n", argv[1][i]);
+            exit(1);
+        }
     }
     if (atoi(argv[2]) < 0 ){
         printf("Error: Expected second parameter to be a positive number, got %d\n", atoi(argv[2]));
@@ -51,6 +59,7 @@ int main(int argc, char *argv [])
             exit(1);
         }
     }
+    
     char *id = argv[1];
     char *key = argv[3];
     int value = random_number(atoi(argv[4]), atoi(argv[5]));
@@ -65,11 +74,7 @@ int main(int argc, char *argv [])
     // fclose(fp);
 
     //print id, key and value
-    printf("%s\n%s\n%d\n", id, key, value);
-
-
-
-
+    printf("%s#%s#%d\n", id, key, value);
 
     return 0;
 }

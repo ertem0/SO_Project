@@ -12,22 +12,25 @@
 #include <stdarg.h>
 #include <time.h>
 #include "SharedMEM.h"
+#include <string.h>
+#include <sys/stat.h>
+#include <signal.h>
 
 int QUEUE_SZ;
 int N_WORKERS;
 int MAX_KEYS;
 int MAX_SENSORS;
 int MAX_ALERTS;
-FILE *fl;
 int shmid;
+int fl;
 SharedMEM *sharedmem;
 
 void lprint(const char* format, ...) {
     // check if file exists
-    if (fl == NULL)
+    if (fl == -1)
     {
         printf("Error writting to file! File pointer is null\n");
-        exit(1);
+        return;
     }
 
     time_t now = time(NULL);
@@ -41,31 +44,49 @@ void lprint(const char* format, ...) {
     pthread_mutex_lock(&sharedmem->mutex_log);
     va_list args;
     va_start(args, format);
-    printf("[%d:%d:%d] ", hour, min, sec);
-    vprintf(format, args);
-    fprintf(fl, "[%d:%d:%d] ", hour, min, sec);
-    vfprintf(fl, format, args);
+    char str[1024];
+    char time[20];
+    vsprintf(str, format, args);
+    sprintf(time, "[%02d:%02d:%02d] ", hour, min, sec);
+    write(fl, time, strlen(time));
+    write(fl, str, strlen(str));
+    printf("%s", time);
+    printf("%s", str);
     va_end(args);
     pthread_mutex_unlock(&sharedmem->mutex_log);
 }
 
 void sysclose(){
-    //close log file
-    fclose(fl);
-    lprint("Log file closed successfully\n");
     //close mutex
-    pthread_mutex_destroy(&sharedmem->mutex);
-    pthread_mutex_destroy(&sharedmem->mutex_log);
-    lprint("Mutexs closed successfully\n");
+    //check if mutex is open
+    if(&sharedmem->mutex != NULL){
+        pthread_mutex_destroy(&sharedmem->mutex);
+        printf("Mutex closed successfully\n");
+    }
+    if(&sharedmem->mutex_log != NULL){
+        pthread_mutex_destroy(&sharedmem->mutex_log);
+        printf("Log mutex closed successfully\n");
+    }
     //close condition variable
-    pthread_cond_destroy(&sharedmem->cond);
-    lprint("Condition variable closed successfully\n");
+    if(&sharedmem->cond != NULL){
+        pthread_cond_destroy(&sharedmem->cond);
+        printf("Condition variable closed successfully\n");
+    }
     //detach and delete shared memory
-    shmdt(sharedmem);
-    shmctl(shmid, IPC_RMID, NULL);
-    printf("Shared memory deleted successfully\n");
+    if(sharedmem != NULL){
+        shmdt(sharedmem);
+        shmctl(shmid, IPC_RMID, NULL);
+        printf("Shared memory deleted successfully\n");
+    }
+    //close log file
+    //check if file is open
+    if (fl != -1)
+    {
+        close(fl);
+        printf("Log file closed successfully\n");
+    }
 
-    return;
+    exit(0);
 }
 
 int readConfigFile(char *filename)
@@ -193,18 +214,50 @@ void systemManager(){
     long id[3]={0,1,2};
     pthread_t threads[3];
     //create threads consoleReader, sensorReader, dispacher
-    pthread_create(&threads[0], NULL, consoleReader, (void *)id[0]);
-    pthread_create(&threads[1], NULL, sensorReader, (void *)id[1]);
-    pthread_create(&threads[2], NULL, dispacher, (void *)id[2]);
+    if(pthread_create(&threads[0], NULL, consoleReader, (void *)id[0]) != 0){
+        perror("Error creating console reader thread");
+        //fechar o sys
+        return;
+    }
+    if(pthread_create(&threads[1], NULL, sensorReader, (void *)id[1]) != 0){
+        perror("Error creating sensor reader thread");
+        //fechar o sys
+        //close threads[0]
+        pthread_cancel(threads[0]);
+        return;
+    }
+    if(pthread_create(&threads[2], NULL, dispacher, (void *)id[2]) != 0){
+        perror("Error creating dispacher thread");
+        //fechar o sys
+        //close threads[0] and threads[1]
+        pthread_cancel(threads[0]);
+        pthread_cancel(threads[1]);
+        return;
+    }
 
-    for(int i = 0; i < N_WORKERS; i++){ 
+    pid_t pids[N_WORKERS];
+    int num_forks = 0;
+
+    for (int i = 0; i < N_WORKERS; i++) {
         pid_t pid = fork();
-        if(pid==0){
+
+        if (pid == 0) {
             worker();
             exit(0);
-        }else if(pid==-1){
-            perror("Error creating worker");
-            exit(0);
+        } else if (pid > 0) {
+            pids[num_forks++] = pid;
+        } else {
+            // Failed to fork
+            perror("Failed to init worker\n");
+
+            for (int j = 0; j < num_forks; j++) {
+                kill(pids[j], SIGTERM);
+            }
+            for(int j = 0; j < 3; j++){
+                pthread_cancel(threads[j]);
+            }
+            //sysclose
+            return;
         }
     }
 
@@ -214,7 +267,14 @@ void systemManager(){
         exit(0);
     }else if(pid==-1){
         perror("Error creating alert watcher");
-        exit(0);
+        for(int i = 0; i < N_WORKERS; i++){
+            kill(pids[i], SIGTERM);
+        }
+        for(int i = 0; i < 3; i++){
+            pthread_cancel(threads[i]);
+        }
+        //fechar o sys
+        return;
     }
 
     //wait for threads to finish
@@ -241,9 +301,8 @@ int main(int argc, char *argv[])
     }
     
     //opening log file
-    fl = fopen("log.txt", "w");
-    if (fl == NULL)
-    {
+    fl = open("log.txt", O_CREAT | O_WRONLY | O_TRUNC, 0666);
+    if(fl == -1){
         perror("Error opening log file");
         return 0;
     }
@@ -254,7 +313,7 @@ int main(int argc, char *argv[])
     {
         perror("shmget");
         //TODO: fechar o q tenho ate agora (acho q ta tudo)
-        fclose(fl);
+        close(fl);
         return 0;
     }    
     sharedmem = (SharedMEM *)shmat(shmid, NULL, 0);
@@ -262,19 +321,28 @@ int main(int argc, char *argv[])
     {
         perror("shmat");
         //TODO: fechar o q tenho ate  (acho q ta tudo)
-        fclose(fl);
         shmctl(shmid, IPC_RMID, NULL);
+        close(fl);
         return 0;
     }
-    lprint("Shared memory created successfully\n");
+    lprint("Shared memory created\n");
 
     //create mutex
     pthread_mutexattr_t att;
     pthread_mutexattr_init(&att);
     //pthread_mutexattr_setrobust(&att, PTHREAD_MUTEX_STALLED);
     pthread_mutexattr_setpshared(&att, PTHREAD_PROCESS_SHARED);
-    pthread_mutex_init(&sharedmem->mutex, &att);
-    pthread_mutex_init(&sharedmem->mutex_log, &att);
+    
+    if (pthread_mutex_init(&sharedmem->mutex, &att) != 0) {
+        printf("Failed to initialize mutex.\n");
+        sysclose();
+        return 1;
+    }
+    if(pthread_mutex_init(&sharedmem->mutex_log, &att) != 0){
+        printf("Failed to initialize log mutex.\n");
+        sysclose();
+        return 1;
+    }
 
     //create semaphores
     //maybe not needed
@@ -283,8 +351,11 @@ int main(int argc, char *argv[])
     pthread_condattr_t condatt;
     pthread_condattr_init(&condatt);
     pthread_condattr_setpshared(&condatt, PTHREAD_PROCESS_SHARED);
-    pthread_cond_init(&sharedmem->cond, &condatt);
-
+    if(pthread_cond_init(&sharedmem->cond, &condatt) != 0){
+        printf("Failed to initialize condition variable.\n");
+        sysclose();
+        return 1;
+    }
     
     //read config file
     if(readConfigFile(argv[1])){
