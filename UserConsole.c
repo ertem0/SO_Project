@@ -19,7 +19,7 @@
 int main(int argc, char *argv[])
 {
 
-    if (argc != 2)
+    if (argc < 2)
     {
         printf("Error: Expected 1 parameter, got %d\n", argc);
         exit(1);
@@ -52,22 +52,31 @@ int main(int argc, char *argv[])
         }
         for (size_t i = 0; i < strlen(argv[2]); i++)
         {
-            if (argv[2][i] != '_' && !isalnum(argv[2][i]))
+            if (!isalnum(argv[2][i]))
             {
-                printf("Error: Expected second parameter to be a string with characters, numbers, and _, got %c\n", argv[2][i]);
+                printf("Error: Expected second parameter to be a string with characters and numbers, got %c\n", argv[2][i]);
                 exit(1);
             }
+        }
+        for (size_t i = 0; i < strlen(argv[3]); i++)
+        {
+        if (argv[3][i] != '_' && !isalnum(argv[3][i]))
+        {
+            printf("Error: Expected third parameter to be a string with characters, numbers, and _, got %c\n", argv[3][i]);
+            exit(1);
+        }
         }
        
         if (atoi(argv[4]) > atoi(argv[5]))
         {
-            printf("Error: Expected fourth parameter to be <= fifth parameter, got %d and %d\n", atoi(argv[4]), atoi(argv[5]));
+            printf("Error: Expected fourth parameter has to be <= fifth parameter, got %d and %d\n", atoi(argv[4]), atoi(argv[5]));
             exit(1);
         }
-        int id = atoi(argv[2]);
+        int id = atoi(argv[2]);  //alfanumerico tamanho entre 3 e 32
         char *key = argv[3];
-        int min = atoi(argv[4]);
+        int min = atoi(argv[4]);     //intervalo de valores aceitaveis para a key
         int max = atoi(argv[5]);
+        printf("OK");
     }
 
     if (strcmp(argv[1], "remove_alert") == 0)

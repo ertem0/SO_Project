@@ -27,35 +27,34 @@ int random_number(int min, int max)
 int main(int argc, char *argv [])
 {
 
-    if (argc != 5)
+    if (argc != 6)
     {
-        printf("Error: Expected 4 parameters, got %d\n", argc);
+        printf("Error: Expected 5 parameters, got %d\n", argc);
         exit(1);
     }
-    if (atoi(argv[1]) < 0)
+    //id parameter (SENS1) size must be between 3 and 32
+    if (strlen(argv[1]) < 3 || strlen(argv[1]) > 32)
     {
-        printf("Error: Expected second parameter to be => 0, got %d\n", atoi(argv[1]));
+        printf("Error: Expected first parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[1]));
         exit(1);
     }
-    //first parameter size must be between 3 and 32
-    if (strlen(argv[2]) < 3 || strlen(argv[2]) > 32)
-    {
-        printf("Error: Expected third parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[2]));
+    if (atoi(argv[2]) < 0 ){
+        printf("Error: Expected second parameter to be a positive number, got %d\n", atoi(argv[2]));
         exit(1);
     }
-    //first parameter can be a string with characters, numbers, and _
-    for (size_t i = 0; i < strlen(argv[2]); i++)
+    //forth parameter can be a string with characters, numbers, and _
+    for (size_t i = 0; i < strlen(argv[3]); i++)
     {
-        if (argv[2][i] != '_' && !isalnum(argv[2][i]))
+        if (argv[3][i] != '_' && !isalnum(argv[3][i]))
         {
-            printf("Error: Expected third parameter to be a string with characters, numbers, and _, got %c\n", argv[2][i]);
+            printf("Error: Expected third parameter to be a string with characters, numbers, and _, got %c\n", argv[3][i]);
             exit(1);
         }
     }
-    int id = atoi(argv[1]);
-    char *key = argv[2];
-    int value = random_number(atoi(argv[3]), atoi(argv[4]));
-
+    char *id = argv[1];
+    char *key = argv[3];
+    int value = random_number(atoi(argv[4]), atoi(argv[5]));
+    
     //SEND TO NAMED PIPE
     
     // char *fifo = "/tmp/pipe";
@@ -65,7 +64,11 @@ int main(int argc, char *argv [])
     // fprintf(fp, "%d#%s#%d", id, key, value);
     // fclose(fp);
 
-    
+    //print id, key and value
+    printf("%s\n%s\n%d\n", id, key, value);
+
+
+
 
 
     return 0;
