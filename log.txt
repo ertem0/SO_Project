@@ -1,26 +1,20 @@
-[19:23:11] Shared memory created
-[19:23:11] Mutex created
-[19:23:11] Condition variable created
-[19:23:11] FIFOs created
-[19:23:11] QUEUE_SZ = 10
-[19:23:11] N_WORKERS = 5
-[19:23:11] MAX_KEYS = 300
-[19:23:11] MAX_SENSORS = 10
-[19:23:11] MAX_ALERTS = 50
-[19:23:11] Config file read successfully
-[19:23:11] Console Reader 0 started
-[19:23:11] Worker 833 started
-[19:23:11] Dispacher 2 started
-[19:23:11] Worker 829 started
-[19:23:11] Worker 830 started
-[19:23:11] Worker 831 started
-[19:23:11] Worker 832 started
-[19:23:11] Sensor Reader 1 started
-[19:23:11] Alert Watcher started
-[19:23:11] Alert Watcher finished
-[19:39:54] Worker 833 finished
-[19:39:54] Worker 831 finished
-[19:39:54] Worker 830 finished
-[19:39:54] Worker 829 finished
-[19:39:54] Received SIGINT. Closing program...
-[19:39:54] Worker 832 finished
+[20:27:15] Shared memory created
+[20:27:15] Mutex created
+[20:27:15] Condition variable created
+[20:27:15] FIFOs created
+[20:27:15] QUEUE_SZ = 10
+[20:27:15] N_WORKERS = 5
+[20:27:15] MAX_KEYS = 300
+[20:27:15] MAX_SENSORS = 10
+[20:27:15] MAX_ALERTS = 50
+[20:27:15] Config file read successfully
+[20:27:15] Console Reader 0 started
+[20:27:15] Sensor Reader 1 started
+[20:27:15] Dispacher 2 started
+[20:27:15] Worker 153 started
+[20:27:15] Worker 154 started
+[20:27:15] Worker 155 started
+[20:27:15] Worker 156 started
+[20:27:15] Worker 157 started
+[20:27:15] Alert Watcher started
+[20:27:15] Alert Watcher finished

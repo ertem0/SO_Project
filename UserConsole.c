@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
     }
 
     while (1) {
+        UserCommand user_command;
+        user_command.console_id = id;
         printf("Enter command: ");
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
@@ -84,7 +86,12 @@ int main(int argc, char *argv[])
                 printf("Error: Expected 0 parameters, got %d\n", num_args);
                 continue;
             }
+            user_command.command = command;
+            user_command.args = NULL;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
             break;
+
         }
 
         else if(strcmp(command,"stats") == 0){
@@ -95,8 +102,7 @@ int main(int argc, char *argv[])
             printf("Key\tLast\tMin\tMax\tAvg\tCount\n");
             
             //UGLY: perguntar ao stor se este e o tamanho que tenho que enviar
-            UserCommand user_command;
-            user_command.console_id = id;
+        
             user_command.command = command;
             user_command.args = NULL;
             printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
@@ -109,6 +115,11 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("ID\n");
+
+            user_command.command = command;
+            user_command.args = NULL;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
         }
 
         else if(strcmp(command,"reset") == 0){
@@ -117,6 +128,11 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("OK\n");
+            
+            user_command.command = command;
+            user_command.args = NULL;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
         }
 
         else if (strcmp(command, "add_alert") == 0)
@@ -130,7 +146,6 @@ int main(int argc, char *argv[])
             int min = atoi(args[2]);
             int max = atoi(args[3]);
             int err = 0;
-           
             if (strlen(alert_id) < 3 || strlen(alert_id) > 32)
             {
                 printf("Error: Expected first parameter to be between 3 and 32 characters, got %ld\n", strlen(alert_id));
@@ -167,6 +182,17 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("OK\n");
+
+            user_command.command = command;
+            user_command.num_args = num_args;
+            user_command.args = (union arguments*) malloc(sizeof(union arguments)*(num_args));
+            strcpy(user_command.args[0].argchar, alert_id);
+            strcpy(user_command.args[1].argchar, key);
+            user_command.args[2].argint = min;
+            user_command.args[3].argint = max;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
+            free(user_command.args);
         }
 
         else if (strcmp(command, "remove_alert") == 0)
@@ -195,6 +221,11 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("OK\n");
+
+            user_command.command = command;
+            user_command.args = alert_id;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
         }
 
         else if(strcmp(command,"list_alerts") == 0){
@@ -203,6 +234,11 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("ID\tKey\tMIN\tMAX\n");
+
+            user_command.command = command;
+            user_command.args = NULL;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
         }
         else{
             printf("Error: Unknown command %s\n", command);
