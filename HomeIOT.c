@@ -348,25 +348,25 @@ void *dispacher(void *arg){
         printf("Dispacher %ld waiting for iq\n", my_id);
         while(is_empty(iq))
             pthread_cond_wait(&sharedmem->cond_iq, &sharedmem->mutex_iq);
-        data = remove_message(iq);
-        if(data == NULL){
+        payload = remove_message(iq);
+        if(payload == NULL){
             printf("Dispacher %ld received NULL\n", my_id);
             pthread_mutex_unlock(&sharedmem->mutex_iq);
             continue;
         }
         pthread_mutex_unlock(&sharedmem->mutex_iq);
         
-        printf("Dispacher %ld received %s\n", my_id, data);
+        printf("Dispacher %ld received %d\n", my_id, payload->type);
         
         printf("Dispacher %ld sending to worker %d\n", my_id, wpids[found]);
         //UGLY: perguntar ao stor sobre o tamanho do buffer
-        write(upipefd[found][1], data, sizeof(data));
+        write(upipefd[found][1], payload, sizeof(payload));
         pthread_mutex_lock(&sharedmem->mutex_worker_ready);
         sharedmem->worker_ready[found] = 0;
         pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
 
 
-        free(data);
+        free(payload);
     }
     pthread_mutex_unlock(&sharedmem->mutex_wait_worker_ready);
     
@@ -396,14 +396,17 @@ void *consoleReader(void *arg){
     pthread_mutex_unlock(&sharedmem->mutex_userc_pipe);
     printf("console_fifo opened\n");
 
-    UserCommand uc;
     ssize_t bytes_read;
     //read from console
     while(1){
         pthread_mutex_lock(&sharedmem->mutex_userc_pipe);
-        bytes_read = read(console_fd, &uc, USERCOMMANDSIZE);
-        Data data;
-        data.user_command = &uc;
+        UserCommand *uc = malloc(sizeof(UserCommand));
+        bytes_read = read(console_fd, uc, USERCOMMANDSIZE);
+
+        Payload *payload = malloc(sizeof(Payload));
+        payload->type = TYPE_USER_COMMAND;
+        payload->data->user_command = uc;
+
         pthread_mutex_unlock(&sharedmem->mutex_userc_pipe);
         if(bytes_read < 0){
             perror("Error reading from console: ");
@@ -414,11 +417,11 @@ void *consoleReader(void *arg){
         }
         else {
             // buffer[bytes_read] = '\0';
-            printf("Read from console: %s\n", uc.command);
+            printf("Read from console: %s\n", payload->data->user_command->command);
             //add to queue
             pthread_mutex_lock(&sharedmem->mutex_iq);
-            if(add_message(iq, &data, 1) == -1){
-                lprint("Queue is full, message (%s) not added\n", uc.command);
+            if(add_message(iq, payload, 1) == -1){
+                lprint("Queue is full, message (%s) not added\n", uc->command);
                 //TODO: wait until queue is not full
             }
             pthread_cond_signal(&sharedmem->cond_iq);
