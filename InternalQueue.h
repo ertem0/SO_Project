@@ -21,9 +21,13 @@ typedef union Data
     UserCommand *user_command;
 } Data;
 
-typedef struct Message {
+typedef struct Payload {
     DataType type;
     Data *data;
+} Payload;
+
+typedef struct Message {
+    Payload *payload;
     int priority;
     struct Message *next;
 } Message;
@@ -36,9 +40,9 @@ typedef struct InternalQueue {
 
 InternalQueue *create_queue(int max_size);
 
-int add_message(InternalQueue *queue, Data *data, int priority);
+int add_message(InternalQueue *queue, Payload *payload, int priority);
 
-Data *remove_message(InternalQueue *queue);
+Payload *remove_message(InternalQueue *queue);
 
 void list_messages(InternalQueue *queue);
 

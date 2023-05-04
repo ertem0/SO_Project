@@ -309,7 +309,7 @@ void *dispacher(void *arg){
     //create unamed pipe
     
 
-    Data *data;
+    Payload *payload;
     //wait for signal
     //TODO: change while condition to a signal to end program
     //FIXME: when no workers ready cant add to queue
