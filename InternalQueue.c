@@ -1,5 +1,4 @@
 #include "InternalQueue.h"
-
 InternalQueue *create_queue(int max_size) {
     InternalQueue *queue = (InternalQueue *)malloc(sizeof(InternalQueue));
     queue->head = NULL;
@@ -45,13 +44,13 @@ Payload *remove_message(InternalQueue *queue) {
     free(removed_msg);
 
     queue->size--;
-    return removed_msg->payload;
+    return payload;
 }
 
 void list_messages(InternalQueue *queue) {
     Message *current = queue->head;
     while (current != NULL) {
-        printf("Priority: %d, Message: %s\n", current->priority, current->payload->type ? "User Command" : "Sensor Data");
+        printf("Priority: %d, DataType: %d\n", current->priority, current->payload->type);
         current = current->next;
     }
 }
@@ -61,18 +60,10 @@ void free_queue(InternalQueue *queue) {
     while (current != NULL) {
         Message *temp = current;
         current = current->next;
-        if(temp->payload->type == TYPE_SENSOR_DATA) {
-            free(temp->payload->data->sensor_data->id);
-            free(temp->payload->data->sensor_data->key);
-            free(temp->payload->data);
-        } else {
-            free(temp->payload->data->user_command->command);
-            for(int i = 0; i < temp->payload->data->user_command->num_args; i++){
-                free(temp->payload->data->user_command->args[i].argchar);
-                }
-            free(temp->payload->data);
-        }
-        free(temp->payload->data);
+        if(temp->payload->type == TYPE_SENSOR_DATA)
+            free(temp->payload->data->sensor_data);
+        else
+            free(temp->payload->data->user_command);
         free(temp->payload);
         free(temp);
     }
