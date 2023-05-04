@@ -1,27 +1,36 @@
+//TODO: perguntar ao stor q recursos limpar e como sair quando da erro a escrever para o pipe
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <semaphore.h>
-#include <pthread.h>
-#include <fcntl.h>  
-#include <stdarg.h>
-#include "SharedMEM.h"
 #include <string.h>
 #include <ctype.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <signal.h>
 
+#define SENSOR_FIFO "/tmp/sensor_fifo"
+int count = 0;
+struct sigaction a_sigtstp;
+struct sigaction a_sigint;
 
-//generate random munber between min and max parameters
 int random_number(int min, int max)
 {
     return rand() % (max - min + 1) + min;
 }
 
+void sigtstp_handler()
+{
+    printf("%d messages sent\n", count);
+}
+
+void sigint_handler()
+{
+    printf("Sensor %d exiting\n", getpid());
+    exit(0);
+}
 
 
 int main(int argc, char *argv [])
@@ -61,8 +70,50 @@ int main(int argc, char *argv [])
     }
     
     char *id = argv[1];
+    int time = atoi(argv[2]);
     char *key = argv[3];
-    int value = random_number(atoi(argv[4]), atoi(argv[5]));
+    int min = atoi(argv[4]);
+    int max = atoi(argv[5]);
+    //open named pipe
+    int sensor_fd = open(SENSOR_FIFO, O_WRONLY);
+    if (sensor_fd < 0)
+    {
+        printf("Error: Could not open sensor fifo\n");
+        exit(1);
+    }
+
+    a_sigtstp.sa_handler = sigtstp_handler;
+    sigfillset(&a_sigtstp.sa_mask);
+    a_sigtstp.sa_flags = 0;
+    sigaction(SIGTSTP, &a_sigtstp, NULL);
+
+    a_sigint.sa_handler = sigint_handler;
+    sigfillset(&a_sigint.sa_mask);
+    a_sigint.sa_flags = 0;
+    sigaction(SIGINT, &a_sigint, NULL);
+
+    char buffer[100];
+    while(1)
+    {
+        int value = random_number(min, max);
+        //sleep for time seconds
+        int x = sleep(time);
+        while (x != 0)
+        {
+            x = sleep(x);
+        }
+        
+
+        sprintf(buffer, "%s#%s#%d", id, key, value);
+        printf("%s\n", buffer);
+        //send to named pipe
+        if(write(sensor_fd, buffer, strlen(buffer)) < 0)
+        {
+            printf("Error: Could not write to sensor fifo\n");
+            exit(1);
+        }
+        count++;
+    }
     
     //SEND TO NAMED PIPE
     
@@ -73,8 +124,6 @@ int main(int argc, char *argv [])
     // fprintf(fp, "%d#%s#%d", id, key, value);
     // fclose(fp);
 
-    //print id, key and value
-    printf("%s#%s#%d\n", id, key, value);
 
     return 0;
 }

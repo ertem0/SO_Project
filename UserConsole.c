@@ -3,20 +3,16 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <semaphore.h>
-#include <pthread.h>
-#include <fcntl.h>  
-#include <stdarg.h>
-#include "SharedMEM.h"
 #include <string.h>
 #include <ctype.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include "UserCommand.h"
 
 #define MAX_ARGS 4
 #define MAX_ARG_LEN 32
+#define CONSOLE_FIFO "/tmp/console_fifo"
 
 int main(int argc, char *argv[])
 {
@@ -27,27 +23,38 @@ int main(int argc, char *argv[])
     }
 
     //id parameter (SENS1) size must be between 3 and 32
-    if (strlen(argv[1]) < 3 || strlen(argv[1]) > 32)
-    {
-        printf("Error: Expected first parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[1]));
+    // if (strlen(argv[1]) < 3 || strlen(argv[1]) > 32)
+    // {
+    //     printf("Error: Expected first parameter to be between 3 and 32 characters, got %ld\n", strlen(argv[1]));
+    //     exit(1);
+    // }
+    //only alfanumeric characters
+    // for(size_t i = 0; i < strlen(argv[1]); i++)
+    // {
+    //     if (!isalnum(argv[1][i]))
+    //     {
+    //         printf("Error: Expected first parameter to be a string with characters and numbers, got %c\n", argv[1][i]);
+    //         exit(1);
+    //     }
+    // }
+    if (atoi(argv[1]) < 0 ){
+        printf("Error: Expected parameter to be a positive number, got %d\n", atoi(argv[1]));
         exit(1);
     }
-    //only alfanumeric characters
-    for(size_t i = 0; i < strlen(argv[1]); i++)
-    {
-        if (!isalnum(argv[1][i]))
-        {
-            printf("Error: Expected first parameter to be a string with characters and numbers, got %c\n", argv[1][i]);
-            exit(1);
-        }
-    }
-    char *id = argv[1];
+    int id = atoi(argv[1]);
     
     char input[100];
     char command[MAX_ARG_LEN+1];
     char args[MAX_ARGS][MAX_ARG_LEN+1];
     int num_args;
     
+    int console_fd = open(CONSOLE_FIFO, O_WRONLY);
+    if (console_fd < 0)
+    {
+        printf("Error: Could not open console fifo\n");
+        exit(1);
+    }
+
     while (1) {
         printf("Enter command: ");
         fgets(input, sizeof(input), stdin);
@@ -86,6 +93,14 @@ int main(int argc, char *argv[])
                 continue;
             }
             printf("Key\tLast\tMin\tMax\tAvg\tCount\n");
+            
+            //UGLY: perguntar ao stor se este e o tamanho que tenho que enviar
+            UserCommand user_command;
+            user_command.console_id = id;
+            user_command.command = command;
+            user_command.args = NULL;
+            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
+            write(console_fd, &user_command, USERCOMMANDSIZE);
         }
 
         else if(strcmp(command,"sensors") == 0){
@@ -194,9 +209,8 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-    
-   
 
+    close(console_fd);
 
     return 0;
 }
