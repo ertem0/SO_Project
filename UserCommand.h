@@ -10,4 +10,4 @@ typedef struct UserCommand {
     union arguments *args;
 } UserCommand;
 
-#define USERCOMMANDSIZE sizeof(UserCommand) + 64*sizeof(char)
+#define USERCOMMANDSIZE sizeof(UserCommand) + 32*sizeof(char)+ 32*4*sizeof(char)
