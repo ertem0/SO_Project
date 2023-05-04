@@ -18,3 +18,9 @@
 [19:23:11] Sensor Reader 1 started
 [19:23:11] Alert Watcher started
 [19:23:11] Alert Watcher finished
+[19:39:54] Worker 833 finished
+[19:39:54] Worker 831 finished
+[19:39:54] Worker 830 finished
+[19:39:54] Worker 829 finished
+[19:39:54] Received SIGINT. Closing program...
+[19:39:54] Worker 832 finished

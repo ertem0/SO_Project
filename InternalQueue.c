@@ -8,13 +8,13 @@ InternalQueue *create_queue(int max_size) {
     return queue;
 }
 
-int add_message(InternalQueue *queue, char *text, int priority) {
+int add_message(InternalQueue *queue, Data *data, int priority) {
     if (queue->size >= queue->max_size) {
         return -1; // Queue is full
     }
 
     Message *new_msg = (Message *)malloc(sizeof(Message));
-    new_msg->text = strdup(text);
+    new_msg->data = data;
     new_msg->priority = priority;
     new_msg->next = NULL;
 
@@ -34,25 +34,23 @@ int add_message(InternalQueue *queue, char *text, int priority) {
     return 0; // Message added successfully
 }
 
-char *remove_message(InternalQueue *queue) {
+Data *remove_message(InternalQueue *queue) {
     if (queue->head == NULL) {
         return NULL;
     }
 
     Message *removed_msg = queue->head;
-    char *text = strdup(removed_msg->text);
     queue->head = removed_msg->next;
-    free(removed_msg->text);
     free(removed_msg);
 
     queue->size--;
-    return text;
+    return removed_msg->data;
 }
 
 void list_messages(InternalQueue *queue) {
     Message *current = queue->head;
     while (current != NULL) {
-        printf("Priority: %d, Message: %s\n", current->priority, current->text);
+        printf("Priority: %d, Message: %s\n", current->priority, current->type ? "User Command" : "Sensor Data");
         current = current->next;
     }
 }
@@ -62,7 +60,7 @@ void free_queue(InternalQueue *queue) {
     while (current != NULL) {
         Message *temp = current;
         current = current->next;
-        free(temp->text);
+        free(temp->data);
         free(temp);
     }
     free(queue);

@@ -15,15 +15,15 @@ typedef struct SensorData {
     int value;
 } SensorData;
 
-union data
+typedef union Data
 {
     SensorData *sensor_data;
     UserCommand *user_command;
-};
+} Data;
 
 typedef struct Message {
     DataType type;
-    union data *data;
+    Data *data;
     int priority;
     struct Message *next;
 } Message;
@@ -36,9 +36,9 @@ typedef struct InternalQueue {
 
 InternalQueue *create_queue(int max_size);
 
-int add_message(InternalQueue *queue, char *text, int priority);
+int add_message(InternalQueue *queue, Data *data, int priority);
 
-char *remove_message(InternalQueue *queue);
+Data *remove_message(InternalQueue *queue);
 
 void list_messages(InternalQueue *queue);
 
