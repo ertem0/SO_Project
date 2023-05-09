@@ -1,20 +1,18 @@
-[20:27:15] Shared memory created
-[20:27:15] Mutex created
-[20:27:15] Condition variable created
-[20:27:15] FIFOs created
-[20:27:15] QUEUE_SZ = 10
-[20:27:15] N_WORKERS = 5
-[20:27:15] MAX_KEYS = 300
-[20:27:15] MAX_SENSORS = 10
-[20:27:15] MAX_ALERTS = 50
-[20:27:15] Config file read successfully
-[20:27:15] Console Reader 0 started
-[20:27:15] Sensor Reader 1 started
-[20:27:15] Dispacher 2 started
-[20:27:15] Worker 153 started
-[20:27:15] Worker 154 started
-[20:27:15] Worker 155 started
-[20:27:15] Worker 156 started
-[20:27:15] Worker 157 started
-[20:27:15] Alert Watcher started
-[20:27:15] Alert Watcher finished
+[03:27:20] Shared memory created
+[03:27:20] Mutex created
+[03:27:20] Condition variable created
+[03:27:20] FIFOs created
+[03:27:20] Console Reader 0 started
+[03:27:20] Sensor Reader 1 started
+[03:27:20] Dispacher 2 started
+[03:27:20] Worker 27606 started
+[03:27:20] Worker 27605 started
+[03:27:20] Worker 27607 started
+[03:27:20] Worker 27608 started
+[03:27:20] Worker 27609 started
+[03:27:20] Alert Watcher started
+[03:27:20] Alert Watcher finished
+[03:27:27] Sensor SENS2 added successfully
+[03:27:27] Key ROOMTEMP added successfully
+[03:27:32] Sensor SENS1 added successfully
+[03:27:32] Key HOUSETEMP added successfully

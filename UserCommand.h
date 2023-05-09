@@ -1,13 +1,13 @@
 union arguments
 {
-    char *argchar;
+    char argchar[128];
     int argint;
 };
 
 typedef struct UserCommand {
     int console_id;
-    char *command;
-    union arguments *args;
+    char command[128];
+    union arguments args[4];
     int num_args;
 } UserCommand;
 

@@ -15,6 +15,7 @@
 int count = 0;
 struct sigaction a_sigtstp;
 struct sigaction a_sigint;
+int sensor_fd;
 
 int random_number(int min, int max)
 {
@@ -29,6 +30,7 @@ void sigtstp_handler()
 void sigint_handler()
 {
     printf("Sensor %d exiting\n", getpid());
+    close(sensor_fd);
     exit(0);
 }
 
@@ -75,7 +77,7 @@ int main(int argc, char *argv [])
     int min = atoi(argv[4]);
     int max = atoi(argv[5]);
     //open named pipe
-    int sensor_fd = open(SENSOR_FIFO, O_WRONLY);
+    sensor_fd = open(SENSOR_FIFO, O_WRONLY);
     if (sensor_fd < 0)
     {
         printf("Error: Could not open sensor fifo\n");
@@ -92,7 +94,7 @@ int main(int argc, char *argv [])
     a_sigint.sa_flags = 0;
     sigaction(SIGINT, &a_sigint, NULL);
 
-    char buffer[100];
+    char buffer[128];
     while(1)
     {
         int value = random_number(min, max);
@@ -107,7 +109,7 @@ int main(int argc, char *argv [])
         sprintf(buffer, "%s#%s#%d", id, key, value);
         printf("%s\n", buffer);
         //send to named pipe
-        if(write(sensor_fd, buffer, strlen(buffer)) < 0)
+        if(write(sensor_fd, &buffer, strlen(buffer)) < 0)
         {
             printf("Error: Could not write to sensor fifo\n");
             exit(1);

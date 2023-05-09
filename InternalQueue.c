@@ -12,7 +12,7 @@ int add_message(InternalQueue *queue, Payload *payload, int priority) {
         return -1; // Queue is full
     }
 
-    Message *new_msg = (Message *)malloc(sizeof(Message));
+    IQMessage *new_msg = (IQMessage *)malloc(sizeof(IQMessage));
     new_msg->payload = payload;
     new_msg->priority = priority;
     new_msg->next = NULL;
@@ -21,7 +21,7 @@ int add_message(InternalQueue *queue, Payload *payload, int priority) {
         new_msg->next = queue->head;
         queue->head = new_msg;
     } else {
-        Message *current = queue->head;
+        IQMessage *current = queue->head;
         while (current->next != NULL && current->next->priority <= priority) {
             current = current->next;
         }
@@ -30,7 +30,7 @@ int add_message(InternalQueue *queue, Payload *payload, int priority) {
     }
 
     queue->size++;
-    return 0; // Message added successfully
+    return 0; // IQMessage added successfully
 }
 
 Payload *remove_message(InternalQueue *queue) {
@@ -38,7 +38,7 @@ Payload *remove_message(InternalQueue *queue) {
         return NULL;
     }
 
-    Message *removed_msg = queue->head;
+    IQMessage *removed_msg = queue->head;
     Payload *payload = removed_msg->payload;
     queue->head = removed_msg->next;
     free(removed_msg);
@@ -48,7 +48,7 @@ Payload *remove_message(InternalQueue *queue) {
 }
 
 void list_messages(InternalQueue *queue) {
-    Message *current = queue->head;
+    IQMessage *current = queue->head;
     while (current != NULL) {
         printf("Priority: %d, DataType: %d\n", current->priority, current->payload->type);
         current = current->next;
@@ -56,14 +56,10 @@ void list_messages(InternalQueue *queue) {
 }
 
 void free_queue(InternalQueue *queue) {
-    Message *current = queue->head;
+    IQMessage *current = queue->head;
     while (current != NULL) {
-        Message *temp = current;
+        IQMessage *temp = current;
         current = current->next;
-        if(temp->payload->type == TYPE_SENSOR_DATA)
-            free(temp->payload->data->sensor_data);
-        else
-            free(temp->payload->data->user_command);
         free(temp->payload);
         free(temp);
     }

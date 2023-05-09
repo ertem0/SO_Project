@@ -10,30 +10,30 @@ typedef enum {
 } DataType;
 
 typedef struct SensorData {
-    char *id;
-    char *key;
+    char id[32];
+    char key[32];
     int value;
 } SensorData;
 
 typedef union Data
 {
-    SensorData *sensor_data;
-    UserCommand *user_command;
+    SensorData sensor_data;
+    UserCommand user_command;
 } Data;
 
 typedef struct Payload {
     DataType type;
-    Data *data;
+    Data data;
 } Payload;
 
-typedef struct Message {
+typedef struct IQMessage {
     Payload *payload;
     int priority;
-    struct Message *next;
-} Message;
+    struct IQMessage *next;
+} IQMessage;
 
 typedef struct InternalQueue {
-    Message *head;
+    IQMessage *head;
     int size;
     int max_size;
 } InternalQueue;

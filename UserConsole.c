@@ -8,7 +8,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/msg.h>
 #include "UserCommand.h"
+#include "MessageQueue.h"
 
 #define MAX_ARGS 4
 #define MAX_ARG_LEN 32
@@ -48,6 +50,11 @@ int main(int argc, char *argv[])
     char args[MAX_ARGS][MAX_ARG_LEN+1];
     int num_args;
     
+    int mqid = msgget(MSG_KEY, IPC_CREAT|0700);
+    if(mqid == -1){
+        perror("Error creating message queue");
+        exit(1);
+    }
     int console_fd = open(CONSOLE_FIFO, O_WRONLY);
     if (console_fd < 0)
     {
@@ -56,8 +63,9 @@ int main(int argc, char *argv[])
     }
 
     while (1) {
-        UserCommand user_command;
-        user_command.console_id = id;
+        UserCommand to_send;
+        to_send.console_id = id;
+        MQMessage msg;
         printf("Enter command: ");
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
@@ -86,10 +94,6 @@ int main(int argc, char *argv[])
                 printf("Error: Expected 0 parameters, got %d\n", num_args);
                 continue;
             }
-            user_command.command = command;
-            user_command.args = NULL;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
             break;
 
         }
@@ -102,11 +106,13 @@ int main(int argc, char *argv[])
             printf("Key\tLast\tMin\tMax\tAvg\tCount\n");
             
             //UGLY: perguntar ao stor se este e o tamanho que tenho que enviar
-        
-            user_command.command = command;
-            user_command.args = NULL;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
+            
+            strncpy(to_send.command, "STATS", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            to_send.num_args = 0;
+
+            write(console_fd, &to_send, sizeof(to_send));
+
         }
 
         else if(strcmp(command,"sensors") == 0){
@@ -116,10 +122,12 @@ int main(int argc, char *argv[])
             }
             printf("ID\n");
 
-            user_command.command = command;
-            user_command.args = NULL;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
+            
+            strncpy(to_send.command, "SENSORS", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            to_send.num_args = 0;
+
+            write(console_fd, &to_send, sizeof(to_send));
         }
 
         else if(strcmp(command,"reset") == 0){
@@ -127,12 +135,12 @@ int main(int argc, char *argv[])
                 printf("Error: Expected 0 parameters, got %d\n", num_args);
                 continue;
             }
-            printf("OK\n");
             
-            user_command.command = command;
-            user_command.args = NULL;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
+            strncpy(to_send.command, "RESET", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            to_send.num_args = 0;
+
+            write(console_fd, &to_send, sizeof(to_send));
         }
 
         else if (strcmp(command, "add_alert") == 0)
@@ -183,16 +191,11 @@ int main(int argc, char *argv[])
             }
             printf("OK\n");
 
-            user_command.command = command;
-            user_command.num_args = num_args;
-            user_command.args = (union arguments*) malloc(sizeof(union arguments)*(num_args));
-            strcpy(user_command.args[0].argchar, alert_id);
-            strcpy(user_command.args[1].argchar, key);
-            user_command.args[2].argint = min;
-            user_command.args[3].argint = max;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
-            free(user_command.args);
+            strncpy(to_send.command, "ADD_ALERT", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            to_send.num_args = 0;
+
+            write(console_fd, &to_send, sizeof(to_send));
         }
 
         else if (strcmp(command, "remove_alert") == 0)
@@ -222,10 +225,14 @@ int main(int argc, char *argv[])
             }
             printf("OK\n");
 
-            user_command.command = command;
-            user_command.args = alert_id;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
+
+            strncpy(to_send.command, "REMOVE_ALERT", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            strncpy(to_send.args[0].argchar, alert_id, sizeof(to_send.args[0].argchar) - 1);
+            to_send.args[0].argchar[sizeof(to_send.args[0].argchar) - 1] = '\0';
+            to_send.num_args = 1;
+
+            write(console_fd, &to_send, sizeof(to_send));
         }
 
         else if(strcmp(command,"list_alerts") == 0){
@@ -235,14 +242,22 @@ int main(int argc, char *argv[])
             }
             printf("ID\tKey\tMIN\tMAX\n");
 
-            user_command.command = command;
-            user_command.args = NULL;
-            printf("sizeof(UserCommand) = %ld\n", USERCOMMANDSIZE);
-            write(console_fd, &user_command, USERCOMMANDSIZE);
+        
+            strncpy(to_send.command, "LIST_ALERTS", sizeof(to_send.command) - 1);
+            to_send.command[sizeof(to_send.command) - 1] = '\0';
+            to_send.num_args = 0;
+
+            write(console_fd, &to_send, sizeof(to_send));
         }
         else{
             printf("Error: Unknown command %s\n", command);
+            continue;
         }
+        if(msgrcv(mqid, &msg, sizeof(msg)-sizeof(long), id, 0) == -1){
+            printf("ERROR\n");
+            continue;
+        }
+        printf("%s", msg.mtext);
         printf("\n");
     }
 
