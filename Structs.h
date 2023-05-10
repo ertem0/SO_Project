@@ -11,13 +11,14 @@ typedef struct SharedMEM
     pthread_mutex_t mutex_iq;
     pthread_mutex_t mutex_keylist;
     pthread_mutex_t mutex_sensorlist;
-    pthread_mutex_t mutex_unamed_pipe;
+    pthread_mutex_t mutex_alertlist;
     pthread_cond_t cond;
     pthread_cond_t cond_wait_worker_ready;
     pthread_cond_t cond_iq;
     int *worker_ready;
     KeyList keylist;
     SensorList sensorlist;
+    AlertList alertlist;
     //ugly: perguntar ao stor sobre onde fica  a mq
 } SharedMEM;
 

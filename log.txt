@@ -1,18 +1,26 @@
-[03:27:20] Shared memory created
-[03:27:20] Mutex created
-[03:27:20] Condition variable created
-[03:27:20] FIFOs created
-[03:27:20] Console Reader 0 started
-[03:27:20] Sensor Reader 1 started
-[03:27:20] Dispacher 2 started
-[03:27:20] Worker 27606 started
-[03:27:20] Worker 27605 started
-[03:27:20] Worker 27607 started
-[03:27:20] Worker 27608 started
-[03:27:20] Worker 27609 started
-[03:27:20] Alert Watcher started
-[03:27:20] Alert Watcher finished
-[03:27:27] Sensor SENS2 added successfully
-[03:27:27] Key ROOMTEMP added successfully
-[03:27:32] Sensor SENS1 added successfully
-[03:27:32] Key HOUSETEMP added successfully
+[20:29:15] Shared memory created
+[20:29:15] Mutex created
+[20:29:15] Condition variable created
+[20:29:15] FIFOs created
+[20:29:15] Sensor Reader 1 started
+[20:29:15] Console Reader 0 started
+[20:29:15] Dispacher 2 started
+[20:29:15] Worker 31202 started
+[20:29:15] Worker 31204 started
+[20:29:15] Worker 31205 started
+[20:29:15] Worker 31206 started
+[20:29:15] Alert Watcher started
+[20:29:15] Alert Watcher finished
+[20:29:15] Worker 31203 started
+[20:29:31] Alert AL1 added successfully
+[20:29:53] Error inserting alert (AL1)
+[20:30:10] Alert AL2 added successfully
+[20:30:25] Alert AL1 removed successfully
+[20:30:37] Alert AL1 added successfully
+[20:30:51] Worker 31204 finished
+[20:30:51] Worker 31205 finished
+[20:30:51] Worker 31206 finished
+[20:30:51] Worker 31203 finished
+[20:30:51] Received SIGINT. Closing program...
+[20:30:51] Worker 31202 is working. Waiting for it to finish...
+[20:30:51] Worker 31202 finished

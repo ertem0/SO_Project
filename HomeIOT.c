@@ -106,8 +106,8 @@ void sysclose(){
         pthread_mutex_destroy(&sharedmem->mutex_sensorlist);
         printf("User console pipe mutex closed successfully\n");
     }
-    if(&sharedmem->mutex_unamed_pipe != NULL){
-        pthread_mutex_destroy(&sharedmem->mutex_unamed_pipe);
+    if(&sharedmem->mutex_alertlist != NULL){
+        pthread_mutex_destroy(&sharedmem->mutex_alertlist);
         printf("Unamed pipe mutex closed successfully\n");
     }
     //close condition variable
@@ -338,7 +338,24 @@ void worker(int id){
     
             }
             else if(strcmp(payload.data.user_command.command, "LIST_ALERTS") == 0){
-            
+                pthread_mutex_lock(&sharedmem->mutex_alertlist);
+                char *allalerts = malloc(sizeof(char)*128*sharedmem->alertlist.size);
+                allalerts[0] = '\0';
+                for(int i=0; i<sharedmem->alertlist.size; i++){
+                    //create a sting with the stats
+                    char *alert = malloc(sizeof(char)*128);
+                    sprintf(alert, "%s %s %d %d\n", sharedmem->alertlist.nodes[i].id, sharedmem->alertlist.nodes[i].key, sharedmem->alertlist.nodes[i].min, sharedmem->alertlist.nodes[i].max);
+                    strcat(allalerts, alert);
+                    free(alert);
+                }
+                pthread_mutex_unlock(&sharedmem->mutex_alertlist);
+                MQMessage msg;
+                msg.mtype = payload.data.user_command.console_id;
+                strcpy(msg.mtext, allalerts);
+                if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                    perror("msgsnd");
+                }
+                free(allalerts);
             }
             else if(strcmp(payload.data.user_command.command, "RESET") == 0){
                 pthread_mutex_lock(&sharedmem->mutex_keylist);
@@ -353,10 +370,48 @@ void worker(int id){
 
             }
             else if(strcmp(payload.data.user_command.command, "REMOVE_ALERT") == 0){
-
+                MQMessage msg;
+                pthread_mutex_lock(&sharedmem->mutex_alertlist);
+                int status = remove_alert(&sharedmem->alertlist, payload.data.user_command.args[0].argchar);
+                pthread_mutex_unlock(&sharedmem->mutex_alertlist);
+                if(status == 0){
+                    lprint("Error removing alert (%s)\n", payload.data.user_command.args[0].argchar);
+                    msg.mtype = payload.data.user_command.console_id;
+                    strcpy(msg.mtext, "ERROR\n");
+                    if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                        perror("msgsnd");
+                    }
+                }
+                else if(status == 1){
+                    lprint("Alert %s removed successfully\n", payload.data.user_command.args[0].argchar);
+                    msg.mtype = payload.data.user_command.console_id;
+                    strcpy(msg.mtext, "OK\n");
+                    if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                        perror("msgsnd");
+                    }
+                }
             }
             else if(strcmp(payload.data.user_command.command, "ADD_ALERT") == 0){
-
+                MQMessage msg;
+                pthread_mutex_lock(&sharedmem->mutex_alertlist);
+                int status = insert_alert(&sharedmem->alertlist, payload.data.user_command.args[0].argchar, payload.data.user_command.args[1].argchar, payload.data.user_command.args[2].argint, payload.data.user_command.args[3].argint);
+                pthread_mutex_unlock(&sharedmem->mutex_alertlist);
+                if(status == 0){
+                    lprint("Error inserting alert (%s)\n", payload.data.user_command.args[0].argchar, sharedmem->alertlist.max_size, sharedmem->alertlist.size);
+                    msg.mtype = payload.data.user_command.console_id;
+                    strcpy(msg.mtext, "ERROR\n");
+                    if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                        perror("msgsnd");
+                    }
+                }
+                else if(status == 1){
+                    lprint("Alert %s added successfully\n", payload.data.user_command.args[0].argchar);
+                    msg.mtype = payload.data.user_command.console_id;
+                    strcpy(msg.mtext, "OK\n");
+                    if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                        perror("msgsnd");
+                    }
+                }
             }
         }
 
@@ -765,7 +820,7 @@ int main(int argc, char *argv[])
 
     //create shared memory of SharedMEM struct
     //ugly: perguntar ao stor se e preciso adicionar o cahr lenght
-    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM) + sizeof(int)*N_WORKERS + (sizeof(KeyNode)+sizeof(char)*MAX_LENGTH) * MAX_KEYS + (sizeof(SensorNode) + sizeof(char)*MAX_LENGTH)*MAX_SENSORS, IPC_CREAT | 0666);
+    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM) + sizeof(int)*N_WORKERS + (sizeof(KeyNode)+sizeof(char)*MAX_LENGTH) * MAX_KEYS + (sizeof(SensorNode) + sizeof(char)*MAX_LENGTH)*MAX_SENSORS + ((sizeof(AlertNode) + sizeof(char)*MAX_LENGTH)*MAX_ALERTS), IPC_CREAT | 0666);
     if (shmid < 0)
     {
         perror("shmget");
@@ -792,7 +847,6 @@ int main(int argc, char *argv[])
     printf("keylist nodes: %p\n", sharedmem->keylist.nodes);
     sharedmem->keylist.size = 0;
     sharedmem->keylist.max_size = MAX_KEYS;
-    sharedmem->keylist.nodes[0].key[0] = '\0';
     printf("last key address %p\n", &sharedmem->keylist.nodes[MAX_KEYS-1]);
 
     //ugly: perguntar ao stor sobre se posso fazer assim o address
@@ -800,8 +854,13 @@ int main(int argc, char *argv[])
     printf("sensorlist nodes: %p\n", sharedmem->sensorlist.nodes);
     sharedmem->sensorlist.size = 0;
     sharedmem->sensorlist.max_size = MAX_SENSORS;
-    sharedmem->sensorlist.nodes[0].id[0] = '\0';
 
+    printf("keynode: %s\nSensorNode: %s\n", sharedmem->keylist.nodes[0].key, sharedmem->sensorlist.nodes[0].id);
+
+    sharedmem->alertlist.nodes = (AlertNode*)((void*)&sharedmem->sensorlist.nodes[MAX_SENSORS-1]) + sizeof(SensorNode);
+    printf("alertlist nodes: %p\n", sharedmem->alertlist.nodes);
+    sharedmem->alertlist.size = 0;
+    sharedmem->alertlist.max_size = MAX_ALERTS;
 
     //create mutex
     pthread_mutexattr_t att;
@@ -844,7 +903,7 @@ int main(int argc, char *argv[])
         sysclose();
         return 1;
     }
-    if(pthread_mutex_init(&sharedmem->mutex_unamed_pipe, &att) != 0){
+    if(pthread_mutex_init(&sharedmem->mutex_alertlist, &att) != 0){
         printf("Failed to initialize alert mutex.\n");
         sysclose();
         return 1;

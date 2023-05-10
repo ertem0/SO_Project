@@ -189,11 +189,16 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            printf("OK\n");
 
             strncpy(to_send.command, "ADD_ALERT", sizeof(to_send.command) - 1);
             to_send.command[sizeof(to_send.command) - 1] = '\0';
-            to_send.num_args = 0;
+            to_send.num_args = 4;
+            strncpy(to_send.args[0].argchar, alert_id, sizeof(to_send.args[0].argchar) - 1);
+            to_send.args[0].argchar[sizeof(to_send.args[0].argchar) - 1] = '\0';
+            strncpy(to_send.args[1].argchar, key, sizeof(to_send.args[1].argchar) - 1);
+            to_send.args[1].argchar[sizeof(to_send.args[1].argchar) - 1] = '\0';
+            to_send.args[2].argint = min;
+            to_send.args[3].argint = max;
 
             write(console_fd, &to_send, sizeof(to_send));
         }
@@ -223,7 +228,6 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
-            printf("OK\n");
 
 
             strncpy(to_send.command, "REMOVE_ALERT", sizeof(to_send.command) - 1);
