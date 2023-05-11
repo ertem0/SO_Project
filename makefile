@@ -20,7 +20,7 @@ $(OBJS_SENSOR): $(SRCS_SENSOR)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(OBJS_CONSOLE): $(SRCS_CONSOLE)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(THREADS) $(CFLAGS) -o $@ $^
 
 clean:
 	rm -f $(OBJS) $(OBJS_SENSOR) $(OBJS_CONSOLE)

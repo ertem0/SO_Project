@@ -11,10 +11,25 @@
 #include <sys/msg.h>
 #include "UserCommand.h"
 #include "MessageQueue.h"
+#include <pthread.h>
 
 #define MAX_ARGS 4
 #define MAX_ARG_LEN 32
 #define CONSOLE_FIFO "/tmp/console_fifo"
+
+int mqid;
+int id;
+MQMessage msg;
+
+void* read_alerts(){
+    while(1){
+        if(msgrcv(mqid, &msg, sizeof(msg)-sizeof(long), id, 0) == -1){
+            perror("Error reading message queue");
+            exit(1);
+        }
+        printf("%s\n", msg.mtext);
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -43,14 +58,14 @@ int main(int argc, char *argv[])
         printf("Error: Expected parameter to be a positive number, got %d\n", atoi(argv[1]));
         exit(1);
     }
-    int id = atoi(argv[1]);
+    id = atoi(argv[1]);
     
     char input[100];
     char command[MAX_ARG_LEN+1];
     char args[MAX_ARGS][MAX_ARG_LEN+1];
     int num_args;
     
-    int mqid = msgget(MSG_KEY, IPC_CREAT|0700);
+    mqid = msgget(MSG_KEY, IPC_CREAT|0700);
     if(mqid == -1){
         perror("Error creating message queue");
         exit(1);
@@ -62,11 +77,16 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    //start a thread to read from the message queue
+    pthread_t thread_id;
+    if(pthread_create(&thread_id, NULL, read_alerts, NULL) != 0){
+        perror("Error creating thread");
+        exit(1);
+    }    
+
     while (1) {
         UserCommand to_send;
         to_send.console_id = id;
-        MQMessage msg;
-        printf("Enter command: ");
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
         
@@ -254,15 +274,9 @@ int main(int argc, char *argv[])
             write(console_fd, &to_send, sizeof(to_send));
         }
         else{
-            printf("Error: Unknown command %s\n", command);
+            printf("Error: Unknown command %s\n\n", command);
             continue;
         }
-        if(msgrcv(mqid, &msg, sizeof(msg)-sizeof(long), id, 0) == -1){
-            printf("ERROR\n");
-            continue;
-        }
-        printf("%s", msg.mtext);
-        printf("\n");
     }
 
     close(console_fd);

@@ -100,15 +100,15 @@ void sysclose(){
     }
     if(&sharedmem->mutex_keylist != NULL){
         pthread_mutex_destroy(&sharedmem->mutex_keylist);
-        printf("Sensor pipe mutex closed successfully\n");
+        printf("Key list mutex closed successfully\n");
     }
     if(&sharedmem->mutex_sensorlist != NULL){
         pthread_mutex_destroy(&sharedmem->mutex_sensorlist);
-        printf("User console pipe mutex closed successfully\n");
+        printf("Sensor list pipe mutex closed successfully\n");
     }
     if(&sharedmem->mutex_alertlist != NULL){
         pthread_mutex_destroy(&sharedmem->mutex_alertlist);
-        printf("Unamed pipe mutex closed successfully\n");
+        printf("Alert list mutex closed successfully\n");
     }
     //close condition variable
     if(&sharedmem->cond != NULL){
@@ -122,6 +122,11 @@ void sysclose(){
     if(&sharedmem->cond_iq != NULL){
         pthread_cond_destroy(&sharedmem->cond_iq);
         printf("Internal queue condition variable closed successfully\n");
+    }
+    sharedmem->cond_alertlist.__data.__wrefs = 0;
+    if(&sharedmem->cond_alertlist != NULL){
+        pthread_cond_destroy(&sharedmem->cond_alertlist);
+        printf("Alert List condition variable closed successfully\n");
     }
     //detach and delete shared memory
     if(sharedmem != NULL){
@@ -159,14 +164,20 @@ void sysclose(){
     if(iq != NULL)
         free_queue(iq);
 
+    //TODO: free others
+
     exit(0);
 }
 
 void ctrlc_handler(){
     lprint("Received SIGINT. Closing program...\n");
     //close threads
+    // is_running = 0;
+    // pthread_cond_broadcast(&sharedmem->cond_wait_worker_ready);
+    // pthread_cond_broadcast(&sharedmem->cond_iq);
     for(int i = 0; i < 3; i++){
         pthread_cancel(threads[i]);
+        printf("Thread %d closed successfully\n", i);
     }
 
     //wait for processes to finish
@@ -244,15 +255,74 @@ int readConfigFile(char *filename)
     return 1;
 }
 
+void alertWatcher_sigint(){
+
+    if(is_working){
+        lprint("Alert Watcher is working. Waiting for it to finish...\n");
+        is_running = 0;
+    }
+    else{
+        lprint("Alert Watcher finished\n");
+        
+        exit(0);
+    }
+}
+
 void alertWatcher(){
+    struct sigaction act;
+    act.sa_handler = alertWatcher_sigint;
+    sigaction(SIGINT, &act, NULL);
+
     lprint("Alert Watcher started\n");
 
+    pthread_mutex_lock(&sharedmem->mutex_alertlist);
+    while(is_running){
+
+        is_working = 0;
+        pthread_cond_wait(&sharedmem->cond_alertlist, &sharedmem->mutex_alertlist);
+        is_working = 1;
+        //todo: search de todas
+        int size;
+        AlertNode **alerts = get_alerts(&sharedmem->alertlist, sharedmem->alertlist.modified, &size);
+        if(size == 0){
+            lprint("Error searching for alert (%s)\n", sharedmem->alertlist.modified);
+            continue;
+        }
+        pthread_mutex_lock(&sharedmem->mutex_keylist);
+        KeyNode *key = search(&sharedmem->keylist, sharedmem->alertlist.modified);
+        if(key == NULL){
+            lprint("Error searching for key (%s)\n", sharedmem->alertlist.modified);
+            pthread_mutex_unlock(&sharedmem->mutex_keylist);
+            continue;
+        }
+        KeyNode *tempKey = malloc(sizeof(KeyNode));
+        memcpy(tempKey, key, sizeof(KeyNode));
+        printf("!!!Alert Watcher found key %s\n", key->key);
+        printf("<><><><><><> size: %d\n", size);
+        pthread_mutex_unlock(&sharedmem->mutex_keylist);
+        for(int i=0; i<size; i++){
+            printf("!!!Alert Watcher found alert %s\n", alerts[i]->id);
+            printf("%d>%d || %d<%d\n", alerts[i]->min, tempKey->last, alerts[i]->max, tempKey->last);
+            if(alerts[i]->min > tempKey->last || alerts[i]->max < tempKey->last){
+                MQMessage msg;
+                msg.mtype = alerts[i]->console_id;
+                sprintf(msg.mtext, "ALERT %s (%s %d TO %d) TRIGGERED\n", alerts[i]->id, alerts[i]->key, alerts[i]->min, alerts[i]->max);
+                lprint("%s", msg.mtext);
+                if (msgsnd(mqid, &msg, sizeof(msg)-sizeof(long), 0) == -1) {
+                    perror("msgsnd");
+                }
+            }
+        }
+        free(alerts);
+        free(tempKey);
+    }
+    pthread_mutex_unlock(&sharedmem->mutex_alertlist);
     //read from shared memory
     //check if key is valid
     //if key is valid, send to sensor
     //if key is invalid, send to alert
 
-    lprint("Alert Watcher finished\n");
+    printf("Alert Watcher finished\n");
     return;
 }
 
@@ -319,11 +389,14 @@ void worker(int id){
                 pthread_mutex_lock(&sharedmem->mutex_sensorlist);
                 char *allsensors = malloc(sizeof(char)*128*sharedmem->sensorlist.size);
                 allsensors[0] = '\0';
+                printf("allsensors (%s)", allsensors);
+                printf("sensorlist size (%d)", sharedmem->sensorlist.size);
                 for(int i=0; i<sharedmem->sensorlist.size; i++){
                     //create a sting with the stats
                     char *sensor = malloc(sizeof(char)*128);
                     sprintf(sensor, "%s\n", sharedmem->sensorlist.nodes[i].id);
                     strcat(allsensors, sensor);
+                    printf("sensor (%s)", sensor);
                     free(sensor);
                 }
                 pthread_mutex_unlock(&sharedmem->mutex_sensorlist);
@@ -394,7 +467,7 @@ void worker(int id){
             else if(strcmp(payload.data.user_command.command, "ADD_ALERT") == 0){
                 MQMessage msg;
                 pthread_mutex_lock(&sharedmem->mutex_alertlist);
-                int status = insert_alert(&sharedmem->alertlist, payload.data.user_command.args[0].argchar, payload.data.user_command.args[1].argchar, payload.data.user_command.args[2].argint, payload.data.user_command.args[3].argint);
+                int status = insert_alert(&sharedmem->alertlist, payload.data.user_command.args[0].argchar, payload.data.user_command.args[1].argchar, payload.data.user_command.args[2].argint, payload.data.user_command.args[3].argint, payload.data.user_command.console_id);
                 pthread_mutex_unlock(&sharedmem->mutex_alertlist);
                 if(status == 0){
                     lprint("Error inserting alert (%s)\n", payload.data.user_command.args[0].argchar, sharedmem->alertlist.max_size, sharedmem->alertlist.size);
@@ -421,36 +494,36 @@ void worker(int id){
             
             pthread_mutex_lock(&sharedmem->mutex_sensorlist);
             status_sensor = insert_sensor(&sharedmem->sensorlist, payload.data.sensor_data.id);
-            pthread_mutex_unlock(&sharedmem->mutex_sensorlist);
             if(status_sensor == 0){
                 lprint("Error inserting sensor (%s) max size reached (max: %d, current:%d)\n", payload.data.sensor_data.id, sharedmem->sensorlist.max_size, sharedmem->sensorlist.size);
             }
-            //ugly: perguntar ao stor sobre se é esta a ordem
-            else if(status_sensor == 2 || status_sensor == 1){
-                lprint("Sensor %s added successfully\n", payload.data.sensor_data.id);
-                printf("Worker %d inserting key %s\n", getpid(), payload.data.sensor_data.key);
-                pthread_mutex_lock(&sharedmem->mutex_keylist);
+            else if(status_sensor == 1){
+                lprint("Sensor already in list (%s)\n", payload.data.sensor_data.id);
+            }
+            else if(status_sensor == 2){
+                lprint("Sensor %s added successfully\n", sharedmem->sensorlist.nodes[sharedmem->sensorlist.size-1].id);
+            }
+            pthread_mutex_unlock(&sharedmem->mutex_sensorlist);
+            printf("Worker %d inserting key %s\n", getpid(), payload.data.sensor_data.key);
+            pthread_mutex_lock(&sharedmem->mutex_keylist);
                 status_key = insert(&sharedmem->keylist, payload.data.sensor_data.key, payload.data.sensor_data.value);
-                pthread_mutex_unlock(&sharedmem->mutex_keylist);
-                printf("Worker %d inserted key %s code: %d\n", getpid(), payload.data.sensor_data.key, status_key);
-                if(status_key == 0){
-                    lprint("Error inserting key (%s) max size reached (max: %d, current:%d)\n", payload.data.sensor_data.key, sharedmem->keylist.max_size, sharedmem->keylist.size);
-                }
-                else if(status_key == 1){
-                    lprint("Key %s updated successfully\n", payload.data.sensor_data.key);
-                }
-                else if(status_key == 2){
-                    lprint("Key %s added successfully\n", payload.data.sensor_data.key);
-                }
+            pthread_mutex_unlock(&sharedmem->mutex_keylist);
+            pthread_mutex_lock(&sharedmem->mutex_alertlist);
+                strcpy(sharedmem->alertlist.modified, payload.data.sensor_data.key);
+                pthread_cond_signal(&sharedmem->cond_alertlist);
+            pthread_mutex_unlock(&sharedmem->mutex_alertlist);
+            printf("Worker %d inserted key %s code: %d\n", getpid(), payload.data.sensor_data.key, status_key);
+            if(status_key == 0){
+                lprint("Error inserting key (%s) max size reached (max: %d, current:%d)\n", payload.data.sensor_data.key, sharedmem->keylist.max_size, sharedmem->keylist.size);
+            }
+            else if(status_key == 1){
+                lprint("Key %s updated successfully\n", payload.data.sensor_data.key);
+            }
+            else if(status_key == 2){
+                lprint("Key %s added successfully\n", payload.data.sensor_data.key);
             }
 
             
-        }
-
-        //TODO: meter um while para prevenir o spam de ctrlc
-        int x = sleep(10);
-        if(x > 0){
-            sleep(x);
         }
 
         is_working = 0;
@@ -480,7 +553,7 @@ void *dispacher(void *arg){
     //TODO: change while condition to a signal to end program
     //FIXME: when no workers ready cant add to queue
     pthread_mutex_lock(&sharedmem->mutex_wait_worker_ready);
-    while (1)
+    while (1) //is_running)
     {
         int found = -1;
         //get which worker is ready
@@ -508,12 +581,26 @@ void *dispacher(void *arg){
                 }
                 pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
             }
+
+            // if(is_running == 0){
+            //     pthread_mutex_unlock(&sharedmem->mutex_wait_worker_ready);
+            //     printf("Dispacher %ld finished\n", my_id);
+            //     pthread_exit(NULL);
+            // }
         }
         
         pthread_mutex_lock(&sharedmem->mutex_iq);
         printf("Dispacher %ld waiting for iq\n", my_id);
-        while(is_empty(iq))
+        while(is_empty(iq)){
             pthread_cond_wait(&sharedmem->cond_iq, &sharedmem->mutex_iq);
+            
+            // if(is_running == 0){
+            //     pthread_mutex_unlock(&sharedmem->mutex_iq);
+            //     pthread_mutex_unlock(&sharedmem->mutex_wait_worker_ready);
+            //     printf("Dispacher %ld finished\n", my_id);
+            //     pthread_exit(NULL);
+            // }
+        }
         payload = remove_message(iq);
         if(payload == NULL){
             printf("Dispacher %ld received NULL\n", my_id);
@@ -819,8 +906,7 @@ int main(int argc, char *argv[])
     }
 
     //create shared memory of SharedMEM struct
-    //ugly: perguntar ao stor se e preciso adicionar o cahr lenght
-    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM) + sizeof(int)*N_WORKERS + (sizeof(KeyNode)+sizeof(char)*MAX_LENGTH) * MAX_KEYS + (sizeof(SensorNode) + sizeof(char)*MAX_LENGTH)*MAX_SENSORS + ((sizeof(AlertNode) + sizeof(char)*MAX_LENGTH)*MAX_ALERTS), IPC_CREAT | 0666);
+    shmid = shmget(IPC_PRIVATE, sizeof(SharedMEM) + sizeof(int)*N_WORKERS + sizeof(KeyNode) * MAX_KEYS + sizeof(SensorNode)*MAX_SENSORS + sizeof(AlertNode)*MAX_ALERTS, IPC_CREAT | 0666);
     if (shmid < 0)
     {
         perror("shmget");
@@ -838,30 +924,39 @@ int main(int argc, char *argv[])
         return 0;
     }
     lprint("Shared memory created\n");
-    sharedmem->worker_ready = (int*)((void*)sharedmem) + sizeof(SharedMEM);
+    sharedmem->worker_ready = (int*)(((void*)sharedmem) + sizeof(SharedMEM));
     for(int i = 0; i < N_WORKERS; i++){
         sharedmem->worker_ready[i] = 0;
     }
 
-    sharedmem->keylist.nodes = (KeyNode*)((void*)sharedmem->worker_ready) + sizeof(int)*N_WORKERS;
+    sharedmem->keylist.nodes = (KeyNode*)(((void*)sharedmem->worker_ready) + sizeof(int)*N_WORKERS);
     printf("keylist nodes: %p\n", sharedmem->keylist.nodes);
     sharedmem->keylist.size = 0;
     sharedmem->keylist.max_size = MAX_KEYS;
-    printf("last key address %p\n", &sharedmem->keylist.nodes[MAX_KEYS-1]);
-
-    //ugly: perguntar ao stor sobre se posso fazer assim o address
-    sharedmem->sensorlist.nodes = (SensorNode*)((void*)&sharedmem->keylist.nodes[MAX_KEYS-1]) + sizeof(KeyNode);
+    //print start pointer of each node
+    printf("node size %d\n", sizeof(KeyNode));
+    for(int i = 0; i < MAX_KEYS; i++){
+        printf("keylist node %d: %ld\n", i, &sharedmem->keylist.nodes[i]);
+    }
+    
+    sharedmem->sensorlist.nodes = (SensorNode*)(((void*)sharedmem->keylist.nodes) + (sizeof(KeyNode)*MAX_KEYS));
     printf("sensorlist nodes: %p\n", sharedmem->sensorlist.nodes);
     sharedmem->sensorlist.size = 0;
     sharedmem->sensorlist.max_size = MAX_SENSORS;
-
-    printf("keynode: %s\nSensorNode: %s\n", sharedmem->keylist.nodes[0].key, sharedmem->sensorlist.nodes[0].id);
-
-    sharedmem->alertlist.nodes = (AlertNode*)((void*)&sharedmem->sensorlist.nodes[MAX_SENSORS-1]) + sizeof(SensorNode);
+    printf("node size %d\n", sizeof(SensorNode));
+    for(int i = 0; i < MAX_SENSORS; i++){
+        printf("sensorlist node %d: %ld\n", i, &sharedmem->sensorlist.nodes[i]);
+    }
+    
+    sharedmem->alertlist.nodes = (AlertNode*)(((void*)sharedmem->sensorlist.nodes) + sizeof(SensorNode) * MAX_SENSORS);
     printf("alertlist nodes: %p\n", sharedmem->alertlist.nodes);
     sharedmem->alertlist.size = 0;
     sharedmem->alertlist.max_size = MAX_ALERTS;
-
+    printf("node size %d\n", sizeof(AlertNode));
+    for(int i = 0; i < MAX_ALERTS; i++){
+        printf("alertlist node %d: %ld\n", i, &sharedmem->alertlist.nodes[i]);
+    }
+    
     //create mutex
     pthread_mutexattr_t att;
     pthread_mutexattr_init(&att);
@@ -932,6 +1027,11 @@ int main(int argc, char *argv[])
         sysclose();
         return 1;
     }
+    if(pthread_cond_init(&sharedmem->cond_alertlist, &condatt) != 0){
+        printf("Failed to initialize condition variable.\n");
+        sysclose();
+        return 1;
+    }
     lprint("Condition variable created\n");
 
     // Creates the named pipe if it doesn't exist yet
@@ -948,7 +1048,6 @@ int main(int argc, char *argv[])
     lprint("FIFOs created\n");
 
     //create message queue
-    //ugly: perguntar so stor sobre as flags
     mqid = msgget(MSG_KEY, IPC_CREAT|0700);
     if(mqid == -1){
         perror("Error creating message queue");

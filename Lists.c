@@ -141,7 +141,39 @@ AlertNode* search_alert(AlertList *list, char *id)
     return NULL;
 }
 
-int insert_alert(AlertList *list, char *id, char *key, int min, int max)
+AlertNode* search_alertkey(AlertList *list, char *key)
+{
+    if(list->size == 0){
+        return NULL;
+    }
+    for (int i = 0; i < list->size; i++)
+    {
+        if (strcmp(list->nodes[i].key, key) == 0)
+        {
+            return &list->nodes[i];
+        }
+    }
+    return NULL;
+}
+
+//get all alerts for a key
+AlertNode** get_alerts(AlertList *list, char *key, int *size)
+{
+    AlertNode **nodes = malloc(sizeof(AlertNode*) * list->size);
+    int count = 0;
+    for (int i = 0; i < list->size; i++)
+    {
+        if (strcmp(list->nodes[i].key, key) == 0)
+        {
+            nodes[count] = &list->nodes[i];
+            count++;
+        }
+    }
+    *size = count;
+    return nodes;
+}
+
+int insert_alert(AlertList *list, char *id, char *key, int min, int max, int console_id)
 {
     printf("process %d inserting %s %s %d %d\n", getpid(), id, key, min, max);
     AlertNode *node = search_alert(list, id);
@@ -158,6 +190,7 @@ int insert_alert(AlertList *list, char *id, char *key, int min, int max)
     strcpy(new_node->key, key);
     new_node->min = min;
     new_node->max = max;
+    new_node->console_id = console_id;
     list->size++;
     return 1;
 }
