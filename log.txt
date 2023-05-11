@@ -1,50 +1,12 @@
-[01:08:02] Shared memory created
-[01:08:02] Mutex created
-[01:08:02] Condition variable created
-[01:08:02] FIFOs created
-[01:08:02] Sensor Reader 1 started
-[01:08:02] Dispacher 2 started
-[01:08:02] Worker 18545 started
-[01:08:02] Console Reader 0 started
-[01:08:02] Alert Watcher started
-[01:08:39] Alert AL3 added successfully
-[01:09:48] Alert AL1 added successfully
-[01:11:05] Sensor SENS1 added successfully
-[01:11:05] Key HOUSETEMP added successfully
-[01:11:05] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:08] Sensor already in list (SENS1)
-[01:11:08] Key HOUSETEMP updated successfully
-[01:11:08] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:11] Sensor already in list (SENS1)
-[01:11:11] Key HOUSETEMP updated successfully
-[01:11:14] Sensor already in list (SENS1)
-[01:11:14] Key HOUSETEMP updated successfully
-[01:11:14] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:14] ALERT AL1 (HOUSETEMP 20 TO 90) TRIGGERED
-[01:11:17] Sensor already in list (SENS1)
-[01:11:17] Key HOUSETEMP updated successfully
-[01:11:17] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:17] ALERT AL1 (HOUSETEMP 20 TO 90) TRIGGERED
-[01:11:20] Sensor already in list (SENS1)
-[01:11:20] Key HOUSETEMP updated successfully
-[01:11:23] Sensor already in list (SENS1)
-[01:11:23] Key HOUSETEMP updated successfully
-[01:11:26] Sensor already in list (SENS1)
-[01:11:26] Key HOUSETEMP updated successfully
-[01:11:29] Sensor already in list (SENS1)
-[01:11:29] Key HOUSETEMP updated successfully
-[01:11:29] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:29] ALERT AL1 (HOUSETEMP 20 TO 90) TRIGGERED
-[01:11:32] Sensor already in list (SENS1)
-[01:11:32] Key HOUSETEMP updated successfully
-[01:11:35] Sensor already in list (SENS1)
-[01:11:35] Key HOUSETEMP updated successfully
-[01:11:35] ALERT AL3 (HOUSETEMP 20 TO 80) TRIGGERED
-[01:11:35] ALERT AL1 (HOUSETEMP 20 TO 90) TRIGGERED
-[01:11:38] Sensor already in list (SENS1)
-[01:11:38] Key HOUSETEMP updated successfully
-[01:11:41] Sensor already in list (SENS1)
-[01:11:41] Key HOUSETEMP updated successfully
-[01:11:45] Alert Watcher finished
-[01:11:45] Worker 18545 finished
-[01:11:45] Received SIGINT. Closing program...
+[18:11:00] Shared memory created
+[18:11:00] Mutex created
+[18:11:00] Condition variable created
+[18:11:00] FIFOs created
+[18:11:00] Console Reader 0 started
+[18:11:00] Sensor Reader 1 started
+[18:11:00] Dispacher 2 started
+[18:11:00] Worker 24543 started
+[18:11:00] Alert Watcher started
+[18:11:00] Alert Watcher finished
+[18:11:00] Worker 24543 finished
+[18:11:00] Received SIGINT. Closing program...

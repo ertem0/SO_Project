@@ -123,6 +123,10 @@ void sysclose(){
         pthread_cond_destroy(&sharedmem->cond_iq);
         printf("Internal queue condition variable closed successfully\n");
     }
+    if(&sharedmem->cond_iq_freed != NULL){
+        pthread_cond_destroy(&sharedmem->cond_iq_freed);
+        printf("Internal queue freed condition variable closed successfully\n");
+    }
     sharedmem->cond_alertlist.__data.__wrefs = 0;
     if(&sharedmem->cond_alertlist != NULL){
         pthread_cond_destroy(&sharedmem->cond_alertlist);
@@ -165,6 +169,17 @@ void sysclose(){
         free_queue(iq);
 
     //TODO: free others
+    if(wpids != NULL)
+        free(wpids);
+
+    if(upipefd != NULL)
+        free(upipefd);
+
+    for(int i = 1; i < N_WORKERS; i++){
+        if(upipefd[i] != NULL)
+            free(upipefd[i]);
+    }
+    
 
     exit(0);
 }
@@ -526,6 +541,12 @@ void worker(int id){
             
         }
 
+        //wait 30 sec
+        int x = sleep(30);
+        while(x > 0){
+            x = sleep(x);
+        }
+
         is_working = 0;
 
         printf("Worker %d finished task\n", getpid());
@@ -602,6 +623,7 @@ void *dispacher(void *arg){
             // }
         }
         payload = remove_message(iq);
+        pthread_cond_signal(&sharedmem->cond_iq_freed);
         if(payload == NULL){
             printf("Dispacher %ld received NULL\n", my_id);
             pthread_mutex_unlock(&sharedmem->mutex_iq);
@@ -671,9 +693,10 @@ void *consoleReader(void *arg){
             printf("Read from console: %s\n", payload->data.user_command.command);
             //add to queue
             pthread_mutex_lock(&sharedmem->mutex_iq);
-            if(add_message(iq, payload, 1) == -1){
+            while(add_message(iq, payload, 1) == -1){
                 lprint("Queue is full, message (%s) not added\n", received.command);
                 //TODO: wait until queue is not full
+                pthread_cond_wait(&sharedmem->cond_iq_freed, &sharedmem->mutex_iq);
             }
             pthread_cond_signal(&sharedmem->cond_iq);
             pthread_mutex_unlock(&sharedmem->mutex_iq);
@@ -1023,6 +1046,11 @@ int main(int argc, char *argv[])
         return 1;
     }
     if(pthread_cond_init(&sharedmem->cond_iq, &condatt) != 0){
+        printf("Failed to initialize condition variable.\n");
+        sysclose();
+        return 1;
+    }
+    if(pthread_cond_init(&sharedmem->cond_iq_freed, &condatt) != 0){
         printf("Failed to initialize condition variable.\n");
         sysclose();
         return 1;

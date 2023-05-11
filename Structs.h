@@ -15,6 +15,7 @@ typedef struct SharedMEM
     pthread_cond_t cond;
     pthread_cond_t cond_wait_worker_ready;
     pthread_cond_t cond_iq;
+    pthread_cond_t cond_iq_freed;
     pthread_cond_t cond_alertlist;
     int *worker_ready;
     KeyList keylist;
