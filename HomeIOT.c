@@ -540,13 +540,6 @@ void worker(int id){
 
             
         }
-
-        //wait 30 sec
-        int x = sleep(30);
-        while(x > 0){
-            x = sleep(x);
-        }
-
         is_working = 0;
 
         printf("Worker %d finished task\n", getpid());
@@ -738,8 +731,8 @@ void *sensorReader(void *arg){
             //break;
         }
         else {
+            buffer[bytes_read] = '\0';
             printf("Read from sensor: %s\n", buffer);
-            // buffer[bytes_read] = '\0';
             Payload *payload = malloc(sizeof(Payload));
             payload->type = TYPE_SENSOR_DATA;
             //split a string of this format x#x#x

@@ -1,12 +1,120 @@
-[18:11:00] Shared memory created
-[18:11:00] Mutex created
-[18:11:00] Condition variable created
-[18:11:00] FIFOs created
-[18:11:00] Console Reader 0 started
-[18:11:00] Sensor Reader 1 started
-[18:11:00] Dispacher 2 started
-[18:11:00] Worker 24543 started
-[18:11:00] Alert Watcher started
-[18:11:00] Alert Watcher finished
-[18:11:00] Worker 24543 finished
-[18:11:00] Received SIGINT. Closing program...
+[18:27:12] Shared memory created
+[18:27:12] Mutex created
+[18:27:12] Condition variable created
+[18:27:12] FIFOs created
+[18:27:12] Console Reader 0 started
+[18:27:12] Sensor Reader 1 started
+[18:27:12] Dispacher 2 started
+[18:27:12] Worker 25498 started
+[18:27:12] Alert Watcher started
+[18:27:24] Sensor SENS1 added successfully
+[18:27:24] Key HOUSETEMP added successfully
+[18:27:24] Error searching for alert (HOUSETEMP)
+[18:27:27] Sensor already in list (SENS1)
+[18:27:27] Error searching for alert (HOUSETEMP)
+[18:27:27] Key HOUSETEMP updated successfully
+[18:27:30] Sensor already in list (SENS1)
+[18:27:30] Key HOUSETEMP updated successfully
+[18:27:30] Error searching for alert (HOUSETEMP)
+[18:27:38] Sensor SENS2 added successfully
+[18:27:38] Key ROOMTEM added successfully
+[18:27:38] Error searching for alert (ROOMTEM)
+[18:27:41] Sensor already in list (SENS2)
+[18:27:41] Key ROOMTEM updated successfully
+[18:27:41] Error searching for alert (ROOMTEM)
+[18:27:44] Sensor already in list (SENS2)
+[18:27:44] Key ROOMTEM updated successfully
+[18:27:44] Error searching for alert (ROOMTEM)
+[18:27:47] Sensor already in list (SENS2)
+[18:27:47] Key ROOMTEM updated successfully
+[18:27:47] Error searching for alert (ROOMTEM)
+[18:27:50] Sensor already in list (SENS2)
+[18:27:50] Key ROOMTEM updated successfully
+[18:27:50] Error searching for alert (ROOMTEM)
+[18:27:53] Sensor already in list (SENS2)
+[18:27:53] Error searching for alert (ROOMTEM)
+[18:27:53] Key ROOMTEM updated successfully
+[18:27:56] Sensor already in list (SENS2)
+[18:27:56] Key ROOMTEM updated successfully
+[18:27:56] Error searching for alert (ROOMTEM)
+[18:27:59] Sensor already in list (SENS2)
+[18:27:59] Key ROOMTEM updated successfully
+[18:27:59] Error searching for alert (ROOMTEM)
+[18:28:02] Sensor already in list (SENS2)
+[18:28:02] Error searching for alert (ROOMTEM)
+[18:28:02] Key ROOMTEM updated successfully
+[18:28:05] Sensor already in list (SENS2)
+[18:28:05] Key ROOMTEM updated successfully
+[18:28:05] Error searching for alert (ROOMTEM)
+[18:28:08] Sensor already in list (SENS2)
+[18:28:08] Key ROOMTEM updated successfully
+[18:28:08] Error searching for alert (ROOMTEM)
+[18:28:11] Sensor already in list (SENS2)
+[18:28:11] Error searching for alert (ROOMTEM)
+[18:28:11] Key ROOMTEM updated successfully
+[18:28:14] Sensor already in list (SENS2)
+[18:28:14] Key ROOMTEM added successfully
+[18:28:14] Error searching for alert (ROOMTEM)
+[18:28:17] Sensor already in list (SENS2)
+[18:28:17] Key ROOMTEM updated successfully
+[18:28:17] Error searching for alert (ROOMTEM)
+[18:28:20] Sensor already in list (SENS2)
+[18:28:20] Key ROOMTEM updated successfully
+[18:28:20] Error searching for alert (ROOMTEM)
+[18:28:23] Sensor already in list (SENS2)
+[18:28:23] Key ROOMTEM updated successfully
+[18:28:23] Error searching for alert (ROOMTEM)
+[18:28:26] Sensor already in list (SENS2)
+[18:28:26] Error searching for alert (ROOMTEM)
+[18:28:26] Key ROOMTEM updated successfully
+[18:28:29] Sensor already in list (SENS2)
+[18:28:29] Key ROOMTEM updated successfully
+[18:28:29] Error searching for alert (ROOMTEM)
+[18:28:32] Sensor already in list (SENS2)
+[18:28:32] Key ROOMTEM updated successfully
+[18:28:32] Error searching for alert (ROOMTEM)
+[18:28:35] Sensor already in list (SENS2)
+[18:28:35] Key ROOMTEM updated successfully
+[18:28:35] Error searching for alert (ROOMTEM)
+[18:28:38] Sensor already in list (SENS2)
+[18:28:38] Error searching for alert (ROOMTEM)
+[18:28:38] Key ROOMTEM updated successfully
+[18:28:41] Sensor already in list (SENS2)
+[18:28:41] Error searching for alert (ROOMTEM)
+[18:28:41] Key ROOMTEM updated successfully
+[18:28:44] Sensor already in list (SENS2)
+[18:28:44] Key ROOMTEM updated successfully
+[18:28:44] Error searching for alert (ROOMTEM)
+[18:28:47] Sensor already in list (SENS2)
+[18:28:47] Key ROOMTEM updated successfully
+[18:28:47] Error searching for alert (ROOMTEM)
+[18:28:50] Sensor already in list (SENS2)
+[18:28:50] Key ROOMTEM updated successfully
+[18:28:50] Error searching for alert (ROOMTEM)
+[18:28:53] Sensor already in list (SENS2)
+[18:28:53] Key ROOMTEM updated successfully
+[18:28:53] Error searching for alert (ROOMTEM)
+[18:28:55] Alert id1 added successfully
+[18:28:56] Sensor already in list (SENS2)
+[18:28:56] Key ROOMTEM updated successfully
+[18:28:59] Sensor already in list (SENS2)
+[18:28:59] Key ROOMTEM updated successfully
+[18:29:02] Sensor already in list (SENS2)
+[18:29:02] Key ROOMTEM updated successfully
+[18:29:05] Sensor already in list (SENS2)
+[18:29:05] Key ROOMTEM updated successfully
+[18:29:05] ALERT id1 (ROOMTEM 30 TO 80) TRIGGERED
+[18:29:08] Sensor already in list (SENS2)
+[18:29:08] Key ROOMTEM updated successfully
+[18:29:11] Sensor already in list (SENS2)
+[18:29:11] Key ROOMTEM updated successfully
+[18:29:11] ALERT id1 (ROOMTEM 30 TO 80) TRIGGERED
+[18:29:14] Sensor already in list (SENS2)
+[18:29:14] Key ROOMTEM updated successfully
+[18:29:17] Sensor already in list (SENS2)
+[18:29:17] Key ROOMTEM updated successfully
+[18:29:20] Sensor already in list (SENS2)
+[18:29:20] Key ROOMTEM updated successfully
+[18:29:27] Alert Watcher finished
+[18:29:27] Worker 25498 finished
+[18:29:27] Received SIGINT. Closing program...
