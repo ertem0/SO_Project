@@ -312,12 +312,16 @@ void alertWatcher(){
         }
         KeyNode *tempKey = malloc(sizeof(KeyNode));
         memcpy(tempKey, key, sizeof(KeyNode));
-        printf("!!!Alert Watcher found key %s\n", key->key);
-        printf("<><><><><><> size: %d\n", size);
+        #ifdef DEBUG
+            printf("!!!Alert Watcher found key %s\n", key->key);
+            printf("<><><><><><> size: %d\n", size);
+        #endif
         pthread_mutex_unlock(&sharedmem->mutex_keylist);
         for(int i=0; i<size; i++){
-            printf("!!!Alert Watcher found alert %s\n", alerts[i]->id);
-            printf("%d>%d || %d<%d\n", alerts[i]->min, tempKey->last, alerts[i]->max, tempKey->last);
+            #ifdef DEBUG 
+                printf("!!!Alert Watcher found alert %s\n", alerts[i]->id);
+                printf("%d>%d || %d<%d\n", alerts[i]->min, tempKey->last, alerts[i]->max, tempKey->last);
+            #endif
             if(alerts[i]->min > tempKey->last || alerts[i]->max < tempKey->last){
                 MQMessage msg;
                 msg.mtype = alerts[i]->console_id;
@@ -358,7 +362,7 @@ void worker(int id){
     act.sa_handler = worker_sigint;
     sigaction(SIGINT, &act, NULL);
 
-    lprint("Worker %d started\n", getpid());
+    lprint("WORKER %d STARTED\n", id);
 
     close(upipefd[id][1]);
 
@@ -368,6 +372,7 @@ void worker(int id){
         pthread_mutex_lock(&sharedmem->mutex_wait_worker_ready);
         pthread_mutex_lock(&sharedmem->mutex_worker_ready);
         sharedmem->worker_ready[id] = 1;
+        lprint("WORKER %d IS READY\n", id);
         pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
         pthread_cond_signal(&sharedmem->cond_wait_worker_ready);
         pthread_mutex_unlock(&sharedmem->mutex_wait_worker_ready);
@@ -378,7 +383,9 @@ void worker(int id){
         
         //wait for signal
         if(payload.type == TYPE_USER_COMMAND){
-            printf("Worker %d received %s\n", getpid(), payload.data.user_command.command);
+            #ifdef DEBUG 
+            printf("Worker %d received %s\n", id, payload.data.user_command.command);
+            #endif
             if(strcmp(payload.data.user_command.command, "STATS") == 0){
                 pthread_mutex_lock(&sharedmem->mutex_keylist);
                 char *allstats = malloc(sizeof(char)*128*sharedmem->keylist.size);
@@ -404,18 +411,21 @@ void worker(int id){
                 pthread_mutex_lock(&sharedmem->mutex_sensorlist);
                 char *allsensors = malloc(sizeof(char)*128*sharedmem->sensorlist.size);
                 allsensors[0] = '\0';
+                #ifdef DEBUG 
                 printf("allsensors (%s)", allsensors);
                 printf("sensorlist size (%d)", sharedmem->sensorlist.size);
+                #endif
                 for(int i=0; i<sharedmem->sensorlist.size; i++){
                     //create a sting with the stats
                     char *sensor = malloc(sizeof(char)*128);
                     sprintf(sensor, "%s\n", sharedmem->sensorlist.nodes[i].id);
                     strcat(allsensors, sensor);
-                    printf("sensor (%s)", sensor);
                     free(sensor);
                 }
                 pthread_mutex_unlock(&sharedmem->mutex_sensorlist);
+                #ifdef DEBUG 
                 printf("%s\n", allsensors);
+                #endif
                 MQMessage msg;
                 msg.mtype = payload.data.user_command.console_id;
                 strcpy(msg.mtext, allsensors);
@@ -504,7 +514,9 @@ void worker(int id){
         }
 
         else if(payload.type == TYPE_SENSOR_DATA){
+            #ifdef DEBUG 
             printf("Worker %d received %s\n", getpid(), payload.data.sensor_data.id);
+            #endif
             int status_key, status_sensor;
             
             pthread_mutex_lock(&sharedmem->mutex_sensorlist);
@@ -519,7 +531,9 @@ void worker(int id){
                 lprint("Sensor %s added successfully\n", sharedmem->sensorlist.nodes[sharedmem->sensorlist.size-1].id);
             }
             pthread_mutex_unlock(&sharedmem->mutex_sensorlist);
+            #ifdef DEBUG 
             printf("Worker %d inserting key %s\n", getpid(), payload.data.sensor_data.key);
+            #endif
             pthread_mutex_lock(&sharedmem->mutex_keylist);
                 status_key = insert(&sharedmem->keylist, payload.data.sensor_data.key, payload.data.sensor_data.value);
             pthread_mutex_unlock(&sharedmem->mutex_keylist);
@@ -527,7 +541,9 @@ void worker(int id){
                 strcpy(sharedmem->alertlist.modified, payload.data.sensor_data.key);
                 pthread_cond_signal(&sharedmem->cond_alertlist);
             pthread_mutex_unlock(&sharedmem->mutex_alertlist);
+            #ifdef DEBUG 
             printf("Worker %d inserted key %s code: %d\n", getpid(), payload.data.sensor_data.key, status_key);
+            #endif
             if(status_key == 0){
                 lprint("Error inserting key (%s) max size reached (max: %d, current:%d)\n", payload.data.sensor_data.key, sharedmem->keylist.max_size, sharedmem->keylist.size);
             }
@@ -542,7 +558,20 @@ void worker(int id){
         }
         is_working = 0;
 
-        printf("Worker %d finished task\n", getpid());
+        if(payload.type == TYPE_USER_COMMAND){
+            if(strcmp(payload.data.user_command.command, "REMOVE_ALERT") == 0){
+                lprint("WORKER %d: %s %s PROCESSING COMPLETED\n", id, payload.data.user_command.command, payload.data.user_command.args[0].argchar);
+            }
+            else if(strcmp(payload.data.user_command.command, "ADD_ALERT") == 0){
+                lprint("WORKER %d: %s %s (%s %d TO %d) PROCESSING COMPLETED\n", id, payload.data.user_command.command, payload.data.user_command.args[0].argchar, payload.data.user_command.args[1].argchar, payload.data.user_command.args[2].argint, payload.data.user_command.args[3].argint);
+            }
+            else{
+                lprint("WORKER %d: %s PROCESSING COMPLETED\n", id, payload.data.user_command.command);
+            }
+        }
+        else if(payload.type == TYPE_SENSOR_DATA){
+            lprint("WORKER %d: %s DATA (FROM %s SENSOR) PROCESSING COMPLETED\n", id, payload.data.sensor_data.key, payload.data.sensor_data.id);
+        }
     }
     
 
@@ -574,7 +603,9 @@ void *dispacher(void *arg){
         for(int i = 0; i < N_WORKERS; i++){
             pthread_mutex_lock(&sharedmem->mutex_worker_ready);
             if(sharedmem->worker_ready[i] == 1){
-                printf("Dispacher %ld found worker %d ready\n", my_id, wpids[i]);
+                #ifdef DEBUG
+                printf("DISPACHER FOUND WORKER %d READY\n", i);
+                #endif
                 pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
                 found = i;
                 break;
@@ -582,13 +613,17 @@ void *dispacher(void *arg){
             pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
         }
         while(found == -1){
+            #ifdef DEBUG
             printf("Dispacher %ld waiting for worker\n", my_id);
+            #endif
             pthread_cond_wait(&sharedmem->cond_wait_worker_ready, &sharedmem->mutex_wait_worker_ready);
 
             for(int i = 0; i < N_WORKERS; i++){
                 pthread_mutex_lock(&sharedmem->mutex_worker_ready);
                 if(sharedmem->worker_ready[i] == 1){
-                    printf("Dispacher %ld found worker %d ready\n", my_id, wpids[i]);
+                    #ifdef DEBUG
+                    printf("DISPACHER FOUND WORKER %d READY\n", i);
+                    #endif
                     pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
                     found = i;
                     break;
@@ -604,7 +639,9 @@ void *dispacher(void *arg){
         }
         
         pthread_mutex_lock(&sharedmem->mutex_iq);
+        #ifdef DEBUG
         printf("Dispacher %ld waiting for iq\n", my_id);
+        #endif
         while(is_empty(iq)){
             pthread_cond_wait(&sharedmem->cond_iq, &sharedmem->mutex_iq);
             
@@ -618,21 +655,43 @@ void *dispacher(void *arg){
         payload = remove_message(iq);
         pthread_cond_signal(&sharedmem->cond_iq_freed);
         if(payload == NULL){
-            printf("Dispacher %ld received NULL\n", my_id);
+
+            lprint("DISPACHER RECIEVED NULL, CONTINUING\n");
             pthread_mutex_unlock(&sharedmem->mutex_iq);
             continue;
         }
         pthread_mutex_unlock(&sharedmem->mutex_iq);
         
+        #ifdef DEBUG
         printf("Dispacher %ld received %d\n", my_id, payload->type);
         
-        printf("Dispacher %ld sending to worker %d\n", my_id, wpids[found]);
+        printf("Dispacher %ld sending to worker %d\n", my_id, found);
+        #endif
         //UGLY: perguntar ao stor sobre o tamanho do buffer e se isto e necessario
         Payload to_send;
         memcpy(&to_send, payload, sizeof(Payload));
+        #ifdef DEBUG
         printf("copyied payload %s\n", to_send.type ? to_send.data.user_command.command : to_send.data.sensor_data.id);
-
-        write(upipefd[found][1], &to_send, sizeof(to_send));
+        #endif
+        if(write(upipefd[found][1], &to_send, sizeof(to_send)) == -1){
+            lprint("ERROR WRITING TO WORKER %d\n", wpids[found]);
+        }
+        else{
+            if(to_send.type == TYPE_USER_COMMAND){
+                if(strcmp(to_send.data.user_command.command, "REMOVE_ALERT") == 0){
+                    lprint("DISPATCHER: %s %s SENT FOR PROCESSING ON WORKER %d\n", to_send.data.user_command.command, to_send.data.user_command.args[0].argchar, found);
+                }
+                else if(strcmp(to_send.data.user_command.command, "ADD_ALERT") == 0){
+                    lprint("DISPATCHER: %s %s (%s %d TO %d) SENT FOR PROCESSING ON WORKER %d\n", to_send.data.user_command.command, to_send.data.user_command.args[0].argchar, to_send.data.user_command.args[1].argchar, to_send.data.user_command.args[2].argint, to_send.data.user_command.args[3].argint, found);
+                }
+                else{
+                    lprint("DISPATCHER: %s SENT FOR PROCESSING ON WORKER %d\n", to_send.data.user_command.command, found);
+                }
+            }
+            else if(to_send.type == TYPE_SENSOR_DATA){
+                lprint("DISPATCHER: %s DATA (FROM %s SENSOR) SENT FOR PROCESSING ON WORKER %d\n", to_send.data.sensor_data.key, to_send.data.sensor_data.id , found);
+            }
+        }
         pthread_mutex_lock(&sharedmem->mutex_worker_ready);
         sharedmem->worker_ready[found] = 0;
         pthread_mutex_unlock(&sharedmem->mutex_worker_ready);
@@ -664,7 +723,9 @@ void *consoleReader(void *arg){
         perror("Cannot open pipe for reading: ");
         sysclose();
     }
+    #ifdef DEBUG
     printf("console_fifo opened\n");
+    #endif
 
     ssize_t bytes_read;
     UserCommand received;
@@ -683,7 +744,9 @@ void *consoleReader(void *arg){
             Payload *payload = malloc(sizeof(Payload));
             payload->type = TYPE_USER_COMMAND;
             payload->data.user_command = received;
+            #ifdef DEBUG
             printf("Read from console: %s\n", payload->data.user_command.command);
+            #endif
             //add to queue
             pthread_mutex_lock(&sharedmem->mutex_iq);
             while(add_message(iq, payload, 1) == -1){
@@ -696,7 +759,9 @@ void *consoleReader(void *arg){
             //signal dispacher
             //wait for worker
             //print iq
+            #ifdef DEBUG
             list_messages(iq);
+            #endif
         }
     }
 
@@ -716,7 +781,9 @@ void *sensorReader(void *arg){
         perror("Cannot open pipe for reading: ");
         sysclose();
     }
+    #ifdef DEBUG
     printf("sensor_fifo opened\n");
+    #endif
 
     ssize_t bytes_read;
     char buffer[128];
@@ -732,7 +799,9 @@ void *sensorReader(void *arg){
         }
         else {
             buffer[bytes_read] = '\0';
+            #ifdef DEBUG
             printf("Read from sensor: %s\n", buffer);
+            #endif
             Payload *payload = malloc(sizeof(Payload));
             payload->type = TYPE_SENSOR_DATA;
             //split a string of this format x#x#x
@@ -756,8 +825,9 @@ void *sensorReader(void *arg){
                 i++;
             }
 
-
+            #ifdef DEBUG
             printf("Read from sensor: %s\n", payload->data.sensor_data.id);
+            #endif
             //add to queue
             pthread_mutex_lock(&sharedmem->mutex_iq);
             if(add_message(iq, payload, 2) == -1){
@@ -769,7 +839,9 @@ void *sensorReader(void *arg){
             //signal dispacher
             //wait for worker
             //print iq
+            #ifdef DEBUG
             list_messages(iq);
+            #endif
         }
     }
 
@@ -946,32 +1018,16 @@ int main(int argc, char *argv[])
     }
 
     sharedmem->keylist.nodes = (KeyNode*)(((void*)sharedmem->worker_ready) + sizeof(int)*N_WORKERS);
-    printf("keylist nodes: %p\n", sharedmem->keylist.nodes);
     sharedmem->keylist.size = 0;
     sharedmem->keylist.max_size = MAX_KEYS;
-    //print start pointer of each node
-    printf("node size %d\n", sizeof(KeyNode));
-    for(int i = 0; i < MAX_KEYS; i++){
-        printf("keylist node %d: %ld\n", i, &sharedmem->keylist.nodes[i]);
-    }
     
     sharedmem->sensorlist.nodes = (SensorNode*)(((void*)sharedmem->keylist.nodes) + (sizeof(KeyNode)*MAX_KEYS));
-    printf("sensorlist nodes: %p\n", sharedmem->sensorlist.nodes);
     sharedmem->sensorlist.size = 0;
     sharedmem->sensorlist.max_size = MAX_SENSORS;
-    printf("node size %d\n", sizeof(SensorNode));
-    for(int i = 0; i < MAX_SENSORS; i++){
-        printf("sensorlist node %d: %ld\n", i, &sharedmem->sensorlist.nodes[i]);
-    }
     
     sharedmem->alertlist.nodes = (AlertNode*)(((void*)sharedmem->sensorlist.nodes) + sizeof(SensorNode) * MAX_SENSORS);
-    printf("alertlist nodes: %p\n", sharedmem->alertlist.nodes);
     sharedmem->alertlist.size = 0;
     sharedmem->alertlist.max_size = MAX_ALERTS;
-    printf("node size %d\n", sizeof(AlertNode));
-    for(int i = 0; i < MAX_ALERTS; i++){
-        printf("alertlist node %d: %ld\n", i, &sharedmem->alertlist.nodes[i]);
-    }
     
     //create mutex
     pthread_mutexattr_t att;

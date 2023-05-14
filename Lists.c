@@ -42,9 +42,9 @@ KeyNode *search(KeyList *list, char *key)
 
 int insert(KeyList *list, char *key, int value)
 {
-    printf("process %d inserting %s %d\n", getpid(), key, value);
+    // printf("process %d inserting %s %d\n", getpid(), key, value);
     KeyNode *node = search(list, key);
-    printf("process %d node %p\n", getpid(), node);
+    // printf("process %d node %p\n", getpid(), node);
     if(node != NULL){
         node->last = value;
         node->count++;
@@ -57,14 +57,14 @@ int insert(KeyList *list, char *key, int value)
         {
             node->max = value;
         }
-        printf("new node %s %d %d %d %d %f\n", node->key, node->last, node->min, node->max, node->count, node->mean);
+        // printf("new node %s %d %d %d %d %f\n", node->key, node->last, node->min, node->max, node->count, node->mean);
         return 1;
     }
     if (list->size == list->max_size)
     {
         return 0;
     }
-    printf("process %d inserting new node\n", getpid());
+    // printf("process %d inserting new node\n", getpid());
     KeyNode *new_node = &list->nodes[list->size];
     if(new_node == NULL)
         return 0;
@@ -107,9 +107,9 @@ SensorNode *search_sensor(SensorList *list, char *id)
 
 int insert_sensor(SensorList *list, char *id)
 {
-    printf("process %d inserting %s\n", getpid(), id);
+    // printf("process %d inserting %s\n", getpid(), id);
     SensorNode *node = search_sensor(list, id);
-    printf("process %d node %p\n", getpid(), node);
+    // printf("process %d node %p\n", getpid(), node);
     if (node){
         return 1;
     }
@@ -117,7 +117,7 @@ int insert_sensor(SensorList *list, char *id)
     {
         return 0;
     }
-    printf("process %d inserting new node\n", getpid());
+    // printf("process %d inserting new node\n", getpid());
     SensorNode *new_node = &list->nodes[list->size];
     if(new_node == NULL)
         return 0;
@@ -175,14 +175,14 @@ AlertNode** get_alerts(AlertList *list, char *key, int *size)
 
 int insert_alert(AlertList *list, char *id, char *key, int min, int max, int console_id)
 {
-    printf("process %d inserting %s %s %d %d\n", getpid(), id, key, min, max);
+    // printf("process %d inserting %s %s %d %d\n", getpid(), id, key, min, max);
     AlertNode *node = search_alert(list, id);
-    printf("process %d node %p\n", getpid(), node);
+    // printf("process %d node %p\n", getpid(), node);
     if (list->size == list->max_size || node)
     {
         return 0;
     }
-    printf("process %d inserting new node\n", getpid());
+    // printf("process %d inserting new node\n", getpid());
     AlertNode *new_node = &list->nodes[list->size];
     if(new_node == NULL)
         return 0;
@@ -197,14 +197,14 @@ int insert_alert(AlertList *list, char *id, char *key, int min, int max, int con
 
 int remove_alert(AlertList *list, char *id)
 {
-    printf("process %d removing %s\n", getpid(), id);
+    // printf("process %d removing %s\n", getpid(), id);
     AlertNode *node = search_alert(list, id);
-    printf("process %d node %p\n", getpid(), node);
+    // printf("process %d node %p\n", getpid(), node);
     if (!node)
     {
         return 0;
     }
-    printf("process %d removing node\n", getpid());
+    // printf("process %d removing node\n", getpid());
     AlertNode *last_node = &list->nodes[list->size - 1];
     strcpy(node->id, last_node->id);
     strcpy(node->key, last_node->key);

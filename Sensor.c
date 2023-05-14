@@ -24,7 +24,7 @@ int random_number(int min, int max)
 
 void sigtstp_handler()
 {
-    printf("%d messages sent\n", count);
+    printf("\n%d messages sent\n", count);
 }
 
 void sigint_handler()
